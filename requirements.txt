@@ -1,0 +1,9 @@
+fastapi
+pandas
+pymongo
+python-dotenv
+motor
+uvicorn[standard]
+pydantic[email]
+passlib[bcrypt]  # For secure password hashing
+pydantic-settings
