@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ValidationError
 from typing import Literal, Optional
 
 class AdminSignupRequest(BaseModel):
@@ -23,5 +23,13 @@ class AdminSignupRequest(BaseModel):
 
 class LoginRequest(BaseModel):
     username: Optional[str] = None
-    email: Optional[EmailStr] = None
+    # email: Optional[EmailStr] = None
     password: str
+
+
+def is_email(value: str) -> bool:
+    try:
+        EmailStr.validate(value)
+        return True
+    except ValidationError:
+        return False

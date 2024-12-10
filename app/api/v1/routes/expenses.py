@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from app.models.admin import AdminSignupRequest, LoginRequest
+from app.models.accounts import AdminSignupRequest, LoginRequest
 from app.core.database import db
 from passlib.context import CryptContext
 

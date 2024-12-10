@@ -5,5 +5,9 @@ python-dotenv
 motor
 uvicorn[standard]
 pydantic[email]
-passlib[bcrypt]  # For secure password hashing
 pydantic-settings
+itsdangerous
+python-jose
+bcrypt
+passlib
+requests
