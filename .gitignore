@@ -1,3 +1,9 @@
 venv
 .env
 tests/
+app/api/v1/routes/__pycache__
+app/core/__pycache__
+app/models/__pycache__
+*.pyc
+*.pyo
+__pycache__/
