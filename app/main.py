@@ -5,7 +5,6 @@ from app.core.config import settings
 from fastapi.security import OAuth2PasswordBearer
 from app.api.v1.routes.expenses import router as expense_router
 from fastapi.openapi.utils import get_openapi
-from app.api.v1.routes.tests import router as test_router
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/accounts/login",
                                      scopes={"read": "Read access", "write": "Write access"})
@@ -38,7 +37,6 @@ app.openapi = custom_openapi
 # Register routes
 app.include_router(admin_router, prefix="/api/v1/accounts", tags=["Admin"])
 app.include_router(expense_router, prefix="/api/v1/expenses", tags=["Expense"])
-app.include_router(test_router, prefix="/api/v1/tests", tags=["Test"])
 
 @app.get("/")
 def read_root():
