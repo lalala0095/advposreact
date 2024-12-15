@@ -4,35 +4,23 @@ from app.core.database import db
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from datetime import datetime, timedelta
-import redis
 import logging
 from app.core.config import settings
+from app.core.auth import store_token_in_redis, delete_token_from_redis, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
+from app.core.custom_logging import create_custom_log
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = settings.secret_key
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # tokenUrl points to the /login endpoint
-
-# Initialize the Redis connection
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
-
-def create_access_token(data: dict, expires_delta: timedelta = None):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire, "role": "admin"})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def admin_signup(admin: AdminSignupRequest):
     if admin.password != admin.confirm_password:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match.")
 
-    existing_admin = await db.admins.find_one({"$or": [{"username": admin.username}, {"email": admin.email}]})
+    existing_admin = await db.accounts.find_one({"$or": [{"username": admin.username}, {"email": admin.email}]})
     if existing_admin:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username or email already registered.")
 
@@ -45,7 +33,16 @@ async def admin_signup(admin: AdminSignupRequest):
         "email": admin.email,
         "subscription": admin.subscription
     }
-    result = await db.admins.insert_one(admin_data)
+    result = await db.accounts.insert_one(admin_data)
+    await create_custom_log(
+        event= "account signup",
+        user_id= None,
+        account_id= result['_id'],
+        objectid= result['_id'],
+        old_doc= None,
+        new_doc= result,
+        error= None
+    )
     return {"message": "Admin account created successfully", "id": str(result.inserted_id)}
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -56,19 +53,33 @@ async def login(request: LoginRequest):
     if not request.username:
         raise HTTPException(status_code=400, detail="Username or Email is required")
 
-    user = await db.admins.find_one({"$or": [{"username": request.username}, {"email": request.username}]})
+    user = await db.accounts.find_one({"$or": [{"username": request.username}, {"email": request.username}]})
     if not user or not verify_password(request.password, user['password']):
         raise HTTPException(status_code=400, detail="Invalid Credentials.")
 
     access_token = create_access_token(data={"sub": str(user["_id"])})
-    return {"access_token": access_token, "token_type": "bearer"}
+
+    # Store the token in Redis with expiration
+    await store_token_in_redis(user_id=str(user["_id"]), token=access_token, expiration=ACCESS_TOKEN_EXPIRE_MINUTES * 60)
+
+    await create_custom_log(
+        event= "account login",
+        user_id= None,
+        account_id= user['_id'],
+        objectid= user['_id'],
+        old_doc= None,
+        new_doc= None,
+        error= None
+    )
+
+    return {"access_token": access_token, "token_type": "bearer", "account_id": str(user['_id'])}
 
 # Define the /protected route
 @router.get("/protected")
 async def protected_route(token: str = Depends(oauth2_scheme)):
     try:
         # Decode the token
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
         if not user_id:
             raise HTTPException(status_code=401, detail="Invalid token.")
@@ -82,11 +93,17 @@ async def protected_route(token: str = Depends(oauth2_scheme)):
 @router.post("/logout")
 async def logout(token: str = Depends(oauth2_scheme)):
     try:
-        # Mark token as revoked in Redis (this simulates logout)
-        redis_client.setex(token, 3600, "revoked")  # Token will be revoked for 1 hour
+        # Decode the token to find the user ID
+        payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token.")
+
+        # Delete the token from Redis
+        await delete_token_from_redis(user_id)
+
         return {"message": "Logged out successfully"}
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error revoking token: {str(e)}")
-
-def revoke_token(token: str):
-    redis_client.setex(token, 3600, "revoked")  # Store the token as revoked in Redis (expires in 1 hour)

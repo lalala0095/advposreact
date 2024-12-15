@@ -11,3 +11,8 @@ python-jose
 bcrypt
 passlib
 requests
+redis
+jwt
+pydantic-settings
+pyjwt
+aioredis
