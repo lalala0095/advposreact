@@ -11,7 +11,7 @@ from app.core.config import settings
 
 async def create_custom_log(event, user_id, account_id, objectid, old_doc, new_doc, error):
     custom_log_data = {
-        "date_of_transaction": datetime.now(),
+        "date_of_log": datetime.now(),
         "event": event,
         "user_id": user_id,
         "account_id": account_id,

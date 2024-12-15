@@ -6,6 +6,7 @@ import pandas as pd
 from bson import ObjectId
 from app.core.auth import verify_token, oauth2_scheme
 import logging
+from datetime import datetime
 
 # # Set up logging
 # logger = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ import logging
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-@router.post("/expenses/")
+@router.post("/")
 async def create_expense(expense: Expenses):
     expense_data = {
         "date_of_transaction": pd.to_datetime(expense.date_of_transaction),
@@ -35,7 +36,7 @@ async def create_expense(expense: Expenses):
     return {"message": "Expense created successfully", "object_id": object_id}
 
 
-@router.put("/expenses/{expense_id}")
+@router.put("/{expense_id}")
 async def update_expense(expense_id: str, updated_expense: Expenses, token: str = Depends(oauth2_scheme)):
     payload = await verify_token(token)
 
@@ -49,6 +50,7 @@ async def update_expense(expense_id: str, updated_expense: Expenses, token: str 
     # Convert Pydantic model to dictionary and process the date field
     updated_data = updated_expense.dict()
     updated_data["date_of_transaction"] = pd.to_datetime(updated_data["date_of_transaction"])
+    updated_data["date_updated"] = datetime.now()
 
     # Perform the update operation
     result = await db.expenses.update_one(
@@ -65,7 +67,7 @@ async def update_expense(expense_id: str, updated_expense: Expenses, token: str 
 
     return {"message": "Expense updated successfully"}
 
-@router.delete("/expenses/{expense_id}")
+@router.delete("/{expense_id}")
 async def delete_expense(expense_id: str, token: str = Depends(oauth2_scheme)):
     print(f"Received token: {token}")
     logging.debug(f"Received token: {token}")  # Debug: Check if token is passed correctly

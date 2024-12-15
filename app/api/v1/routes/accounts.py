@@ -14,6 +14,7 @@ from app.core.custom_logging import create_custom_log
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # tokenUrl points to the /login endpoint
+expiration_duration = ACCESS_TOKEN_EXPIRE_MINUTES * 60
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def admin_signup(admin: AdminSignupRequest):
@@ -60,7 +61,7 @@ async def login(request: LoginRequest):
     access_token = create_access_token(data={"sub": str(user["_id"])})
 
     # Store the token in Redis with expiration
-    await store_token_in_redis(user_id=str(user["_id"]), token=access_token, expiration=ACCESS_TOKEN_EXPIRE_MINUTES * 60)
+    await store_token_in_redis(user_id=str(user["_id"]), token=access_token, expiration=expiration_duration)
 
     await create_custom_log(
         event= "account login",
@@ -72,7 +73,10 @@ async def login(request: LoginRequest):
         error= None
     )
 
-    return {"access_token": access_token, "token_type": "bearer", "account_id": str(user['_id'])}
+    return {"access_token": access_token, 
+            "token_expiration": f"{expiration_duration / 60:.0f} minutes" ,
+            "token_type": "bearer",
+            "account_id": str(user['_id'])}
 
 # Define the /protected route
 @router.get("/protected")

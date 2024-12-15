@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/accounts/login", scopes={"read": "Read access", "write": "Write access"})
 
 # Use a single Redis client with async support
