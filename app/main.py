@@ -7,6 +7,7 @@ from fastapi.openapi.utils import get_openapi
 from app.api.v1.routes.expenses import router as expense_router
 from app.api.v1.routes.cash_flows import router as cash_flow_router
 from app.api.v1.routes.billers import router as biller_router
+from app.api.v1.routes.bills import router as bill_router
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/accounts/login",
                                      scopes={"read": "Read access", "write": "Write access"})
@@ -41,10 +42,11 @@ app.include_router(admin_router, prefix="/api/v1/accounts", tags=["Admin"])
 app.include_router(expense_router, prefix="/api/v1/expenses", tags=["Expense"])
 app.include_router(cash_flow_router, prefix="/api/v1/cash_flows", tags=["Cash Flow"])
 app.include_router(biller_router, prefix="/api/v1/billers", tags=["Biller"])
+app.include_router(bill_router, prefix="/api/v1/bills", tags=["Bills"])
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Admin API"}
+    return {"message": "Welcome to the AdvPOS API Dev page"}
 
 @app.get("/favicon.ico")
 def favicon():

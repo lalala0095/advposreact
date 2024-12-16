@@ -53,10 +53,9 @@ BillType = Enum(
 class Bill(BaseModel):
     date_added: date = Field(..., description="The date when the bill is added")
     biller_object_id: str = Field(..., max_length=100, description="The ObjectId of the specified Biller")
-    biller_name: str = Field(..., max_length=100, description="The Biller Name")
     total_amount_due: float = Field(0, ge=0, description="Total Amount Due")
     minimum_amount_due: float = Field(0, ge=0, description="Minimum Amount Due")
-    bill_type: BillType = Field(..., description="Choose Bill Type")
+    urgency: BillType = Field(..., description="Urgency")
     due_date: date = Field(..., description="Due date")
     remarks: str = Field(..., max_length=500, description="Remarks")
 

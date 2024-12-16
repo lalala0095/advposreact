@@ -8,12 +8,13 @@ import logging
 from app.core.config import settings
 from app.core.auth import store_token_in_redis, delete_token_from_redis, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
 from app.core.custom_logging import create_custom_log
+from app.core.auth import verify_token
 
 # logging.basicConfig(level=logging.DEBUG)
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # tokenUrl points to the /login endpoint
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # tokenUrl points to the /login endpoint
 expiration_duration = ACCESS_TOKEN_EXPIRE_MINUTES * 60
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
@@ -80,13 +81,9 @@ async def login(request: LoginRequest):
 
 # Define the /protected route
 @router.get("/protected")
-async def protected_route(token: str = Depends(oauth2_scheme)):
+async def protected_route(payload: str = Depends(verify_token)):
     try:
-        # Decode the token
-        payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid token.")
 
         logging.debug(f"Token decoded successfully: {payload}")
 
@@ -95,7 +92,7 @@ async def protected_route(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=401, detail="Invalid token.")
 
 @router.post("/logout")
-async def logout(token: str = Depends(oauth2_scheme)):
+async def logout(token: str = Depends(verify_token)):
     try:
         # Decode the token to find the user ID
         payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])

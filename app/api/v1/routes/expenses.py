@@ -37,8 +37,8 @@ async def create_expense(expense: Expenses):
 
 
 @router.put("/{expense_id}")
-async def update_expense(expense_id: str, updated_expense: Expenses, token: str = Depends(oauth2_scheme)):
-    payload = await verify_token(token)
+async def update_expense(expense_id: str, updated_expense: Expenses, token: str = Depends(verify_token)):
+    # payload = await verify_token(token)
 
     # Validate if the provided expense_id is a valid ObjectId
     if not ObjectId.is_valid(expense_id):
@@ -68,12 +68,12 @@ async def update_expense(expense_id: str, updated_expense: Expenses, token: str 
     return {"message": "Expense updated successfully"}
 
 @router.delete("/{expense_id}")
-async def delete_expense(expense_id: str, token: str = Depends(oauth2_scheme)):
+async def delete_expense(expense_id: str, token: str = Depends(verify_token)):
     print(f"Received token: {token}")
     logging.debug(f"Received token: {token}")  # Debug: Check if token is passed correctly
     
     # You can call your verify_token function here to validate the token
-    payload = await verify_token(token)
+    # payload = await verify_token(token)
     
     # Validate if the provided expense_id is a valid ObjectId
     if not ObjectId.is_valid(expense_id):

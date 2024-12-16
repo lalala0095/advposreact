@@ -16,8 +16,8 @@ router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.post("/")
-async def create_cash_flow(cash_flow: CashFlows):
-    payload = await verify_token(token)
+async def create_cash_flow(cash_flow: CashFlows, token: str = Depends(verify_token)):
+    # payload = await verify_token(token)
     cash_flow_data = {
         "date_of_transaction": pd.to_datetime(cash_flow.date_of_transaction),
         "description": cash_flow.description,
@@ -35,8 +35,8 @@ async def create_cash_flow(cash_flow: CashFlows):
 
 
 @router.put("/{cash_flow_id}")
-async def update_cash_flow(cash_flow_id: str, updated_cash_flow: CashFlows, token: str = Depends(oauth2_scheme)):
-    payload = await verify_token(token)
+async def update_cash_flow(cash_flow_id: str, updated_cash_flow: CashFlows, token: str = Depends(verify_token)):
+    # payload = await verify_token(token)
 
     # Validate if the provided cash_flow_id is a valid ObjectId
     if not ObjectId.is_valid(cash_flow_id):
@@ -66,12 +66,12 @@ async def update_cash_flow(cash_flow_id: str, updated_cash_flow: CashFlows, toke
     return {"message": "Cash Flow updated successfully"}
 
 @router.delete("/{cash_flow_id}")
-async def delete_cash_flow(cash_flow_id: str, token: str = Depends(oauth2_scheme)):
+async def delete_cash_flow(cash_flow_id: str, token: str = Depends(verify_token)):
     print(f"Received token: {token}")
     logging.debug(f"Received token: {token}")  # Debug: Check if token is passed correctly
     
     # You can call your verify_token function here to validate the token
-    payload = await verify_token(token)
+    # payload = await verify_token(token)
     
     # Validate if the provided cash_flow_id is a valid ObjectId
     if not ObjectId.is_valid(cash_flow_id):

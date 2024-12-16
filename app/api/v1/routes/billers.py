@@ -3,7 +3,7 @@ from app.core.database import db
 from app.models.expenses import Biller
 import pandas as pd
 from bson import ObjectId
-from app.core.auth import verify_token, oauth2_scheme
+from app.core.auth import verify_token
 import logging
 from datetime import datetime
 from typing import Dict
@@ -12,8 +12,8 @@ import math
 router = APIRouter()
 
 @router.post("/")
-async def create_biller(biller: Biller, token: str = Depends(oauth2_scheme)):
-    payload = await verify_token(token)
+async def create_biller(biller: Biller, token: str = Depends(verify_token)):
+    # payload = await verify_token(token)
     biller_data = {
         "date_added": pd.to_datetime(biller.date_added),
         "biller_name": biller.biller_name,
@@ -31,8 +31,8 @@ async def create_biller(biller: Biller, token: str = Depends(oauth2_scheme)):
 
 
 @router.put("/{biller_id}")
-async def update_biller(biller_id: str, updated_biller: Biller, token: str = Depends(oauth2_scheme)):
-    payload = await verify_token(token)
+async def update_biller(biller_id: str, updated_biller: Biller, token: str = Depends(verify_token)):
+    # payload = await verify_token(token)
 
     # Validate if the provided biller_id is a valid ObjectId
     if not ObjectId.is_valid(biller_id):
@@ -64,12 +64,12 @@ async def update_biller(biller_id: str, updated_biller: Biller, token: str = Dep
     return {"message": "Biller updated successfully"}
 
 @router.delete("/{biller_id}")
-async def delete_biller(biller_id: str, token: str = Depends(oauth2_scheme)):
+async def delete_biller(biller_id: str, token: str = Depends(verify_token)):
     print(f"Received token: {token}")
     logging.debug(f"Received token: {token}")
 
     # You can call your verify_token function here to validate the token
-    payload = await verify_token(token)
+    # payload = await verify_token(token)
     
     # Validate if the provided biller_id is a valid ObjectId
     if not ObjectId.is_valid(biller_id):
@@ -93,8 +93,8 @@ async def delete_biller(biller_id: str, token: str = Depends(oauth2_scheme)):
     return {"message": "Biller deleted successfully"}
 
 @router.get("/", response_model=Dict[str, Dict[str, object]])
-async def get_billers(page: int = 1, limit: int = 10, token: str = Depends(oauth2_scheme)):
-    payload = await verify_token(token)
+async def get_billers(page: int = 1, limit: int = 10, token: str = Depends(verify_token)):
+    # payload = await verify_token(token)
 
     if limit > 10:
         limit = 10
