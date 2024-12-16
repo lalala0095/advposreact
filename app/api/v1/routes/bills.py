@@ -7,21 +7,27 @@ from bson.errors import InvalidId
 from app.core.auth import verify_token
 import logging
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 import math
 
 router = APIRouter()
 
+async def get_biller_object(object_id):
+    print(f"Object id = {object_id}")
+    biller_object = await db.billers.find_one({"_id": ObjectId(object_id)})
+
+    if not biller_object:  # If no biller found in the first collection
+        biller_object = await db.predefined_billers.find_one({"_id": ObjectId(object_id)})
+
+    return biller_object
+
 @router.post("/")
 async def create_bill(bill: Bill, token: str = Depends(verify_token)):
     try:
-        biller_object = await db.billers.find_one({"_id": ObjectId(bill.biller_object_id)})
-        
-        if not biller_object:
-            biller_object = await db.predefined_billers.find_one({"_id": ObjectId(bill.biller_object_id)})
+        biller_object = await get_biller_object(bill.biller_object_id)
 
         bill_data = {
-            "date_added": pd.to_datetime(bill.date_added),
+            "date_added": datetime.now(),
             "biller": biller_object,
             "total_amount_due": bill.total_amount_due,
             "minimum_amount_due": bill.minimum_amount_due,
@@ -41,8 +47,6 @@ async def create_bill(bill: Bill, token: str = Depends(verify_token)):
 
 @router.put("/{bill_id}")
 async def update_bill(bill_id: str, updated_bill: Bill, token: str = Depends(verify_token)):
-    # payload = await verify_token(token)
-
     # Validate if the provided bill_id is a valid ObjectId
     if not ObjectId.is_valid(bill_id):
         raise HTTPException(
@@ -51,11 +55,17 @@ async def update_bill(bill_id: str, updated_bill: Bill, token: str = Depends(ver
         )
 
     # Convert Pydantic model to dictionary and process the date field
-    updated_data = updated_bill.dict()
+    updated_data = dict(updated_bill)
+
+    biller_object = await get_biller_object(updated_data['biller_object_id'])
+
     updated_data["date_added"] = pd.to_datetime(updated_data["date_added"])
     updated_data["date_updated"] = datetime.now()
-    updated_data["bill_type"] = updated_data["bill_type"].value
-    updated_data["amount_type"] = updated_data["amount_type"].value
+    updated_data["biller"] = biller_object
+    updated_data["urgency"] = updated_data['urgency'].value
+    updated_data["due_date"] = pd.to_datetime(updated_data['due_date']) 
+    del updated_data['biller_object_id']
+    print(updated_data)
 
     # Perform the update operation
     result = await db.bills.update_one(
@@ -101,7 +111,7 @@ async def delete_bill(bill_id: str, token: str = Depends(verify_token)):
 
     return {"message": "Bill deleted successfully"}
 
-@router.get("/", response_model=Dict[str, Dict[str, object]])
+@router.get("/", response_model=List[Dict[str, object]])
 async def get_bills(page: int = 1, limit: int = 10, token: str = Depends(verify_token)):
     # payload = await verify_token(token)
 
@@ -115,6 +125,7 @@ async def get_bills(page: int = 1, limit: int = 10, token: str = Depends(verify_
     bills = await db.bills.find().skip(skip).limit(limit).to_list(length=limit)
     for i in bills:
         i['_id'] = str(i['_id'])
+        i['biller']['_id'] = str(i['biller']['_id'])
 
     total_count = await db.bills.count_documents({})
     total_pages = math.ceil(total_count / limit)

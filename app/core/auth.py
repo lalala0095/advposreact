@@ -118,7 +118,7 @@ async def verify_token(token: str = Depends(oauth2_scheme)):
             )
         
         logging.debug(f"User ID from token: {user_id}: {stored_token}")
-        return payload
+        return {"account_id": user_id, "payload": payload}
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(

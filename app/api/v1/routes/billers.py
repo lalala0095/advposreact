@@ -15,7 +15,7 @@ router = APIRouter()
 async def create_biller(biller: Biller, token: str = Depends(verify_token)):
     # payload = await verify_token(token)
     biller_data = {
-        "date_added": pd.to_datetime(biller.date_added),
+        "date_added": datetime.now(),
         "biller_name": biller.biller_name,
         "biller_type": biller.biller_type.value,
         "amount_type": biller.amount_type.value,

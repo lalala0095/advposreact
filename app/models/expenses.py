@@ -16,7 +16,6 @@ AmountType = Enum(
 )
 
 class Biller(BaseModel):
-    date_added: date = Field(..., description="The date when the biller is added")
     biller_name: str = Field(..., max_length=100, description="Biller Name")
     biller_type: BillerType = Field(..., description="Choose if it the amount changes or not")
     amount_type: AmountType = Field(..., description="Choose if it the amount changes or not")
@@ -51,7 +50,6 @@ BillType = Enum(
     {field: field.replace('_', '').title() for field in fields}
 )
 class Bill(BaseModel):
-    date_added: date = Field(..., description="The date when the bill is added")
     biller_object_id: str = Field(..., max_length=100, description="The ObjectId of the specified Biller")
     total_amount_due: float = Field(0, ge=0, description="Total Amount Due")
     minimum_amount_due: float = Field(0, ge=0, description="Minimum Amount Due")

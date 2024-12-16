@@ -31,6 +31,9 @@ def custom_openapi():
             "bearerFormat": "JWT",
         }
     }
+    # openapi_schema["tags"] = [
+    #     { "name": "Accounts", "description": "Account related operations" }
+    # ]
     openapi_schema["security"] = [{"BearerAuth": []}]
     app.openapi_schema = openapi_schema
     return app.openapi_schema
@@ -42,7 +45,7 @@ app.include_router(admin_router, prefix="/api/v1/accounts", tags=["Admin"])
 app.include_router(expense_router, prefix="/api/v1/expenses", tags=["Expense"])
 app.include_router(cash_flow_router, prefix="/api/v1/cash_flows", tags=["Cash Flow"])
 app.include_router(biller_router, prefix="/api/v1/billers", tags=["Biller"])
-app.include_router(bill_router, prefix="/api/v1/bills", tags=["Bills"])
+app.include_router(bill_router, prefix="/api/v1/bills", tags=["Bills"], )
 
 @app.get("/")
 def read_root():

@@ -18,6 +18,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 @router.post("/")
 async def create_expense(expense: Expenses):
     expense_data = {
+        "date_added": datetime.now(),
         "date_of_transaction": pd.to_datetime(expense.date_of_transaction),
         "description": expense.description,
         "price": expense.price,
