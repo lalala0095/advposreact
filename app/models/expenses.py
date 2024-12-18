@@ -24,12 +24,22 @@ class Biller(BaseModel):
     usual_due_date_day: int = Field(1, ge=1, le=31, description="Usual Due Date Day")
     remarks: str = Field(..., max_length=500, description="Remarks")
 
+fields = ['need', 'want']
+ExpenseType = Enum(
+    "ExpenseType",
+    {field: field.replace('_', '').title() for field in fields}
+)
+fields = ['Shopee', 'Tiktok', 'Lazada', 'Physical Store', 'Amazon', 'Ali Express', 'Others']
+ExpensePlatform = Enum(
+    "ExpensePlatform",
+    {field: field.replace('_', '').title() for field in fields}
+)
 class Expenses(BaseModel):
     date_of_transaction: date = Field(..., description="The date when the transaction occurred")
     description: str = Field(..., max_length=255, description="Description of the expense")
     price: float = Field(..., ge=0, description="Price of the expense")
-    expense_type: str = Field(..., max_length=100, description="Type/category of the expense")
-    platform: str = Field(..., max_length=100, description="Platform where the expense was made")
+    expense_type: ExpenseType = Field(..., description="Type/category of the expense")
+    platform: ExpensePlatform = Field(..., description="Platform where the expense was made")
     store: str = Field(..., max_length=255, description="Store or vendor name")
     remarks: str = Field(None, max_length=1000, description="Additional remarks or notes")
     payment_method: str = Field(..., max_length=100, description="Payment method used for the expense")

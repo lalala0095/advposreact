@@ -9,7 +9,7 @@ from datetime import datetime
 from pymongo import MongoClient
 from app.core.config import settings
 
-async def create_custom_log(event, user_id, account_id, objectid, old_doc, new_doc, error):
+async def create_custom_log(event, user_id,  objectid, account_id: str = None, old_doc: dict = None, new_doc: dict = None, page_number: int = None, error: str = None):
     custom_log_data = {
         "date_of_log": datetime.now(),
         "event": event,
@@ -18,6 +18,7 @@ async def create_custom_log(event, user_id, account_id, objectid, old_doc, new_d
         "object_id": objectid,
         "old_doc": old_doc,
         "new_doc": new_doc,
+        "page_number": page_number,
         "error": error
     }
 

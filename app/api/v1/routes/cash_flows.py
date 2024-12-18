@@ -7,18 +7,18 @@ from bson import ObjectId
 from app.core.auth import verify_token, oauth2_scheme
 import logging
 from datetime import datetime
-
-# # Set up logging
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
+from app.core.custom_logging import create_custom_log
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.post("/")
-async def create_cash_flow(cash_flow: CashFlows, token: str = Depends(verify_token)):
-    # payload = await verify_token(token)
+async def create_cash_flow(cash_flow: CashFlows, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
     cash_flow_data = {
+        "date_inserted": datetime.now(),
+        "user_id": user_id,
         "date_of_transaction": pd.to_datetime(cash_flow.date_of_transaction),
         "description": cash_flow.description,
         "price": cash_flow.price,
@@ -31,12 +31,19 @@ async def create_cash_flow(cash_flow: CashFlows, token: str = Depends(verify_tok
     print(cash_flow_data)
     result = await db.cash_flows.insert_one(cash_flow_data)
     object_id = str(result.inserted_id)
+    await create_custom_log(
+        event= "add cash_flow",
+        user_id = user_id,
+        objectid = result.inserted_id,
+        new_doc = await db.cash_flows.find_one({"_id": ObjectId(result.inserted_id)})
+    )
     return {"message": "Cash Flow created successfully", "object_id": object_id}
 
 
 @router.put("/{cash_flow_id}")
-async def update_cash_flow(cash_flow_id: str, updated_cash_flow: CashFlows, token: str = Depends(verify_token)):
-    # payload = await verify_token(token)
+async def update_cash_flow(cash_flow_id: str, updated_cash_flow: CashFlows, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
 
     # Validate if the provided cash_flow_id is a valid ObjectId
     if not ObjectId.is_valid(cash_flow_id):
@@ -45,6 +52,7 @@ async def update_cash_flow(cash_flow_id: str, updated_cash_flow: CashFlows, toke
             detail="Invalid cash_flow ID format"
         )
 
+    old_doc = await db.cash_flows.find_one({"_id": ObjectId(cash_flow_id)})
     # Convert Pydantic model to dictionary and process the date field
     updated_data = updated_cash_flow.dict()
     updated_data["date_of_transaction"] = pd.to_datetime(updated_data["date_of_transaction"])
@@ -55,7 +63,14 @@ async def update_cash_flow(cash_flow_id: str, updated_cash_flow: CashFlows, toke
         {"_id": ObjectId(cash_flow_id)},  # Match the document with the provided ID
         {"$set": updated_data}          # Update with the new data
     )
-
+    new_doc = await db.cash_flows.find_one({"_id": ObjectId(cash_flow_id)})
+    await create_custom_log(
+        event= "update cash_flow",
+        user_id = user_id,
+        objectid = cash_flow_id,
+        old_doc=old_doc,
+        new_doc = new_doc
+    )
     # Check if the document was updated
     if result.matched_count == 0:
         raise HTTPException(
@@ -66,12 +81,9 @@ async def update_cash_flow(cash_flow_id: str, updated_cash_flow: CashFlows, toke
     return {"message": "Cash Flow updated successfully"}
 
 @router.delete("/{cash_flow_id}")
-async def delete_cash_flow(cash_flow_id: str, token: str = Depends(verify_token)):
-    print(f"Received token: {token}")
-    logging.debug(f"Received token: {token}")  # Debug: Check if token is passed correctly
-    
-    # You can call your verify_token function here to validate the token
-    # payload = await verify_token(token)
+async def delete_cash_flow(cash_flow_id: str, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
     
     # Validate if the provided cash_flow_id is a valid ObjectId
     if not ObjectId.is_valid(cash_flow_id):
@@ -79,12 +91,17 @@ async def delete_cash_flow(cash_flow_id: str, token: str = Depends(verify_token)
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid cash_flow ID format"
         )
+    old_doc = await db.cash_flows.find_one({"_id": ObjectId(cash_flow_id)})
 
     # Perform the delete operation
     result = await db.cash_flows.delete_one(
         {"_id": ObjectId(cash_flow_id)}  # Match the document with the provided ID
     )
-
+    await create_custom_log(
+        event= "delete cash_flow",
+        user_id = user_id,
+        old_doc=old_doc
+    )
     # Check if the document was deleted
     if result.deleted_count == 0:
         raise HTTPException(

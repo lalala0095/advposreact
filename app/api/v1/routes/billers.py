@@ -8,31 +8,47 @@ import logging
 from datetime import datetime
 from typing import Dict
 import math
+from app.core.custom_logging import create_custom_log
 
 router = APIRouter()
 
 @router.post("/")
-async def create_biller(biller: Biller, token: str = Depends(verify_token)):
-    # payload = await verify_token(token)
+async def create_biller(biller: Biller, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
     biller_data = {
-        "date_added": datetime.now(),
+        "date_inserted": datetime.now(),
+        "user_id": user_id,
         "biller_name": biller.biller_name,
         "biller_type": biller.biller_type.value,
         "amount_type": biller.amount_type.value,
         "amount": biller.amount,
         "custom_type": biller.custom_type,
         "usual_due_date_day": biller.usual_due_date_day,
-        "remarks": biller.remarks
+        "remarks": biller.remarks,
+        "account_id": user_id
     }
     print(biller_data)
     result = await db.billers.insert_one(biller_data)
     object_id = str(result.inserted_id)
+
+    await create_custom_log(
+        event= "create biller",
+        user_id= user_id,
+        account_id= user_id,
+        objectid= object_id,
+        old_doc= None,
+        new_doc= None,
+        error= None
+    )
+
     return {"message": "Biller created successfully", "object_id": object_id}
 
 
 @router.put("/{biller_id}")
-async def update_biller(biller_id: str, updated_biller: Biller, token: str = Depends(verify_token)):
-    # payload = await verify_token(token)
+async def update_biller(biller_id: str, updated_biller: Biller, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
 
     # Validate if the provided biller_id is a valid ObjectId
     if not ObjectId.is_valid(biller_id):
@@ -40,6 +56,8 @@ async def update_biller(biller_id: str, updated_biller: Biller, token: str = Dep
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid biller ID format"
         )
+
+    existing_biller = await db.billers.find_one({"_id": ObjectId(biller_id)})
 
     # Convert Pydantic model to dictionary and process the date field
     updated_data = updated_biller.dict()
@@ -54,6 +72,18 @@ async def update_biller(biller_id: str, updated_biller: Biller, token: str = Dep
         {"$set": updated_data}
     )
 
+    new_biller = await db.billers.find_one({"_id": ObjectId(biller_id)})
+
+    await create_custom_log(
+        event= "update biller",
+        user_id= user_id,
+        account_id= user_id,
+        objectid= biller_id,
+        old_doc= existing_biller,
+        new_doc= new_biller,
+        error= None
+    )
+
     # Check if the document was updated
     if result.matched_count == 0:
         raise HTTPException(
@@ -64,12 +94,13 @@ async def update_biller(biller_id: str, updated_biller: Biller, token: str = Dep
     return {"message": "Biller updated successfully"}
 
 @router.delete("/{biller_id}")
-async def delete_biller(biller_id: str, token: str = Depends(verify_token)):
-    print(f"Received token: {token}")
-    logging.debug(f"Received token: {token}")
+async def delete_biller(biller_id: str, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
+    print(f"Received token: {payload['token']}")
+    logging.debug(f"Received token: {payload['token']}")
 
-    # You can call your verify_token function here to validate the token
-    # payload = await verify_token(token)
+    existing_biller = await db.billers.find_one({"_id": ObjectId(biller_id)})
     
     # Validate if the provided biller_id is a valid ObjectId
     if not ObjectId.is_valid(biller_id):
@@ -83,6 +114,16 @@ async def delete_biller(biller_id: str, token: str = Depends(verify_token)):
         {"_id": ObjectId(biller_id)}
     )
 
+    await create_custom_log(
+        event= "delete biller",
+        user_id = user_id,
+        account_id = user_id,
+        objectid = biller_id,
+        old_doc = existing_biller,
+        new_doc = None,
+        error= None
+    )
+
     # Check if the document was deleted
     if result.deleted_count == 0:
         raise HTTPException(
@@ -93,8 +134,9 @@ async def delete_biller(biller_id: str, token: str = Depends(verify_token)):
     return {"message": "Biller deleted successfully"}
 
 @router.get("/", response_model=Dict[str, Dict[str, object]])
-async def get_billers(page: int = 1, limit: int = 10, token: str = Depends(verify_token)):
-    # payload = await verify_token(token)
+async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
 
     if limit > 10:
         limit = 10
@@ -116,7 +158,16 @@ async def get_billers(page: int = 1, limit: int = 10, token: str = Depends(verif
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No billers found"
         )
-
+    
+    await create_custom_log(
+        event= "get billers",
+        user_id = user_id,
+        account_id = user_id,
+        page_number= page,
+        new_doc = None,
+        error= None
+    )
+    
     return {
         "response": {
             "limit": limit,

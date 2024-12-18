@@ -9,8 +9,7 @@ from app.core.config import settings
 from app.core.auth import store_token_in_redis, delete_token_from_redis, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
 from app.core.custom_logging import create_custom_log
 from app.core.auth import verify_token
-
-# logging.basicConfig(level=logging.DEBUG)
+from datetime import datetime
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -29,6 +28,7 @@ async def admin_signup(admin: AdminSignupRequest):
     hashed_password = pwd_context.hash(admin.password)
 
     admin_data = {
+        "date_inserted": datetime.now(),
         "username": admin.username,
         "password": hashed_password,
         "name": admin.name,
@@ -66,7 +66,7 @@ async def login(request: LoginRequest):
 
     await create_custom_log(
         event= "account login",
-        user_id= None,
+        user_id= user['_id'],
         account_id= user['_id'],
         objectid= user['_id'],
         old_doc= None,
@@ -81,7 +81,9 @@ async def login(request: LoginRequest):
 
 # Define the /protected route
 @router.get("/protected")
-async def protected_route(payload: str = Depends(verify_token)):
+async def protected_route(token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
     try:
         user_id = payload.get("sub")
 
