@@ -1,4 +1,4 @@
-fastapi
+fastapi[all]
 pandas
 pymongo
 python-dotenv
@@ -12,7 +12,6 @@ bcrypt
 passlib
 requests
 redis
-jwt
 pydantic-settings
-pyjwt
+pyjwt==1.7.1
 aioredis

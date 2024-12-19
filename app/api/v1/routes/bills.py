@@ -48,6 +48,7 @@ async def create_bill(bill: Bill, token_data: dict = Depends(verify_token)):
             event= "add bill",
             user_id = user_id,
             account_id = user_id,
+            objectid = result.inserted_id,
             new_doc = new_object
         )
         return {"message": "Bill created successfully", "object_id": object_id}
