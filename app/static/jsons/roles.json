@@ -1,0 +1,365 @@
+[{
+  "_id": {
+    "$oid": "6764030aa70e4a5e6c8f0af3"
+  },
+  "role": "root",
+  "permissions": [
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0a"
+      },
+      "permission_category": "General",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0b"
+      },
+      "permission_category": "User Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0c"
+      },
+      "permission_category": "Data Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0d"
+      },
+      "permission_category": "Reports and Analytics",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0e"
+      },
+      "permission_category": "System Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0f"
+      },
+      "permission_category": "Inventory Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e10"
+      },
+      "permission_category": "Billing and Payments",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e11"
+      },
+      "permission_category": "Notification Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e12"
+      },
+      "permission_category": "Admin-Only",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6764030aa70e4a5e6c8f0af4"
+  },
+  "role": "admin",
+  "permissions": [
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0a"
+      },
+      "permission_category": "General",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0b"
+      },
+      "permission_category": "User Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0c"
+      },
+      "permission_category": "Data Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0d"
+      },
+      "permission_category": "Reports and Analytics",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0e"
+      },
+      "permission_category": "System Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0f"
+      },
+      "permission_category": "Inventory Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e10"
+      },
+      "permission_category": "Billing and Payments",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e11"
+      },
+      "permission_category": "Notification Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6764030aa70e4a5e6c8f0af5"
+  },
+  "role": "user",
+  "permissions": [
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0a"
+      },
+      "permission_category": "General",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0c"
+      },
+      "permission_category": "Data Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0d"
+      },
+      "permission_category": "Reports and Analytics",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0f"
+      },
+      "permission_category": "Inventory Management",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e10"
+      },
+      "permission_category": "Billing and Payments",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6764030aa70e4a5e6c8f0af6"
+  },
+  "role": "viewer",
+  "permissions": [
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0a"
+      },
+      "permission_category": "General",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e0d"
+      },
+      "permission_category": "Reports and Analytics",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6764030aa70e4a5e6c8f0af7"
+  },
+  "role": "guest",
+  "permissions": [
+    {
+      "_id": {
+        "$oid": "6763fa867f72de2d88923e13"
+      },
+      "permission_category": "Guest or Public",
+      "permissions": [
+        "view_dashboard",
+        "access_app",
+        "view_profile",
+        "update_profile",
+        "delete_account"
+      ]
+    }
+  ]
+}]
