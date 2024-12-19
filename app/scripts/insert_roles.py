@@ -3,78 +3,36 @@ from dotenv import load_dotenv
 import os
 import json
 from bson import ObjectId
-import pandas as pd
 
 load_dotenv()
 
 MONGODB_URL = os.getenv("MONGODB_URI")
 
-roles = [
-    {
-        "role": "root",
-        "permissions": [
-            "General",
-            "User Management",
-            "Data Management",
-            "Reports and Analytics",
-            "System Management",
-            "Inventory Management",
-            "Billing and Payments",
-            "Notification Management",
-            "Admin-Only"
-        ]
-    },
-    {
-        "role": "admin",
-        "permissions": [
-            "General",
-            "User Management",
-            "Data Management",
-            "Reports and Analytics",
-            "System Management",
-            "Inventory Management",
-            "Billing and Payments",
-            "Notification Management"
-        ]
-    },
-    {
-        "role": "user",
-        "permissions": [
-            "General",
-            "Data Management",
-            "Reports and Analytics",
-            "Inventory Management",
-            "Billing and Payments"
-        ]
-    },
-    {
-        "role": "viewer",
-        "permissions": [
-            "General",
-            "Reports and Analytics"
-        ]
-    },
-    {
-        "role": "guest",
-        "permissions": [
-            "Guest or Public"
-        ]
-    }
-]
-
 client = MongoClient(MONGODB_URL)
-coll = client['advpos-react']['permissions']
-
-new_roles = []
-for role in roles:
-    permission_objects = []
-    for index, x in enumerate(role['permissions']):
-        permission_object = coll.find_one({"permission_category": x})
-        permission_objects.append(permission_object)
-    new_roles.append({
-        "role": role['role'],
-        "permissions": permission_objects
-    })
-
 coll = client['advpos-react']['roles']
-coll.insert_many(new_roles)
+
+coll.delete_many({})
+
+with open('app/static/jsons/roles_with_ids.json', 'r') as file:
+    json_roles = json.load(file)
+
+new_docs = []
+for i in json_roles:
+    new_dict = i.copy()
+    new_dict["new_id"] = ObjectId(new_dict["_id"]["$oid"])
+    del new_dict["_id"]
+    new_dict["_id"] = new_dict["new_id"] 
+    del new_dict["new_id"]
+    new_permissions = []
+    for x in i['permissions']:
+        new_dict_perm = x.copy()
+        new_dict_perm["new_id"] = ObjectId(new_dict_perm["_id"]["$oid"])
+        del new_dict_perm["_id"]
+        new_dict_perm["_id"] = new_dict_perm["new_id"] 
+        del new_dict_perm["new_id"]
+        new_permissions.append(new_dict_perm)
+    del new_dict["permissions"]
+    new_dict.update({"permissions": new_permissions})
+    new_docs.append(new_dict)
+
+coll.insert_many(new_docs)

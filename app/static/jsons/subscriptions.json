@@ -1,0 +1,14 @@
+[
+  {
+      "subscription": "free",
+      "expiration": "30 days"
+  },
+  {
+    "subscription": "basic",
+    "expiration": "30 days"
+  },
+  {
+    "subscription": "premium",
+    "expiration": "30 days"
+  }    
+]

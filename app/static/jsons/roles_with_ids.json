@@ -1,0 +1,65 @@
+[{
+  "_id": {
+    "$oid": "676414f472c2fdb6548c7351"
+  },
+  "role": "root",
+  "permissions": [
+    "General",
+    "User Management",
+    "Data Management",
+    "Reports and Analytics",
+    "System Management",
+    "Inventory Management",
+    "Billing and Payments",
+    "Notification Management",
+    "Admin-Only"
+  ]
+},
+{
+  "_id": {
+    "$oid": "676414f472c2fdb6548c7352"
+  },
+  "role": "admin",
+  "permissions": [
+    "General",
+    "User Management",
+    "Data Management",
+    "Reports and Analytics",
+    "System Management",
+    "Inventory Management",
+    "Billing and Payments",
+    "Notification Management"
+  ]
+},
+{
+  "_id": {
+    "$oid": "676414f472c2fdb6548c7353"
+  },
+  "role": "user",
+  "permissions": [
+    "General",
+    "Data Management",
+    "Reports and Analytics",
+    "Inventory Management",
+    "Billing and Payments"
+  ]
+},
+{
+  "_id": {
+    "$oid": "676414f472c2fdb6548c7354"
+  },
+  "role": "viewer",
+  "permissions": [
+    "General",
+    "Reports and Analytics"
+  ]
+},
+{
+  "_id": {
+    "$oid": "676414f472c2fdb6548c7355"
+  },
+  "role": "guest",
+  "permissions": [
+    "Guest or Public"
+  ]
+}]
