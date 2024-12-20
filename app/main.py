@@ -10,12 +10,18 @@ from app.api.v1.routes.cash_flows import router as cash_flow_router
 from app.api.v1.routes.billers import router as biller_router
 from app.api.v1.routes.bills import router as bill_router
 from app.api.v1.routes.support_tickets import router as support_ticket_router
+from fastapi.middleware.cors import CORSMiddleware
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/accounts/login",
                                      scopes={"read": "Read access", "write": "Write access"})
 
 app = FastAPI(title="CRM Backend")
 serializer = URLSafeSerializer(settings.secret_key)  # Replace with your secret key
+
+origins = [
+    "http://localhost:3000",
+    "http://13.250.253.210",
+]
 
 def custom_openapi():
     if app.openapi_schema:
@@ -54,6 +60,14 @@ app.include_router(cash_flow_router, prefix="/api/v1/cash_flows", tags=["Cash Fl
 app.include_router(biller_router, prefix="/api/v1/billers", tags=["Biller"])
 app.include_router(bill_router, prefix="/api/v1/bills", tags=["Bills"], )
 app.include_router(support_ticket_router, prefix="/api/v1/support_tickets", tags=["Support Tickets"], )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 @app.get("/", include_in_schema=False)
 def read_root():
