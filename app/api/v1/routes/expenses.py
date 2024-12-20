@@ -8,10 +8,12 @@ from app.core.auth import verify_token, oauth2_scheme
 import logging
 from datetime import datetime
 from app.core.custom_logging import create_custom_log
+import math
+from typing import List, Dict
 
-logging.basicConfig(
-    level=logging.DEBUG
-)
+# logging.basicConfig(
+#     level=logging.DEBUG
+# )
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -119,3 +121,49 @@ async def delete_expense(expense_id: str, token_data: dict = Depends(verify_toke
         )
 
     return {"message": "Expense deleted successfully"}
+
+
+@router.get("/", response_model=Dict[str, object])
+async def get_expenses(page: int = 1, limit: int = 10, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
+
+    if limit > 10:
+        limit = 10
+
+    # Calculate the skip value based on the page and limit
+    skip = (page - 1) * limit
+
+    # Fetch the paginated data from MongoDB
+    expenses = await db.expenses.find().skip(skip).limit(limit).to_list(length=limit)
+    for i in expenses:
+        i['_id'] = str(i['_id'])
+
+    total_count = await db.expenses.count_documents({})
+    total_pages = math.ceil(total_count / limit)
+
+    # Check if no expenses were found
+    if not expenses:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No expenses found"
+        )
+
+    await create_custom_log(
+        event= "get expenses",
+        user_id = user_id,
+        objectid=None,
+        account_id = user_id,
+        page_number= page
+    )
+        
+    return {
+        "response": {
+            "limit": limit,
+            "page": page,
+            "total_pages": total_pages,
+            "total_items": total_count,
+            "items": expenses
+        }
+    }
+    

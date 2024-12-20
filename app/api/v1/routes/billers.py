@@ -163,6 +163,7 @@ async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends
         event= "get billers",
         user_id = user_id,
         account_id = user_id,
+        objectid=None,
         page_number= page,
         new_doc = None,
         error= None

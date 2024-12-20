@@ -11,11 +11,13 @@ from app.core.custom_logging import create_custom_log
 from app.core.auth import verify_token
 from datetime import datetime, timedelta
 from bson import ObjectId
+import json
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # tokenUrl points to the /login endpoint
 expiration_duration = 3600
+logging.basicConfig(level=logging.DEBUG)
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def admin_signup(admin: AdminSignupRequest):
@@ -66,16 +68,19 @@ async def login(request: LoginRequest):
     user = await db.accounts.find_one({"$or": [{"username": request.username}, {"email": request.username}]})
     if not user or not verify_password(request.password, user['password']):
         raise HTTPException(status_code=400, detail="Invalid Credentials.")
+    # user_dict = json.dumps(user)
 
     access_token = create_access_token(data={"sub": str(user['_id'])})
-
+    logging.debug(f"access token: {access_token}")
+    logging.debug(f"access token type: {type(access_token)}")
+    
     # Store the token in Redis with expiration
     await store_token_in_redis(account_id=str(user["_id"]), token=access_token)
 
     await create_custom_log(
         event= "account login",
-        account_id= user['_id'],
-        user_id= user['_id'],
+        account_id= str(user['_id']),
+        user_id= str(user['_id']),
         objectid= user['_id'],
         old_doc= None,
         new_doc= None,
@@ -100,6 +105,13 @@ async def protected_route(token_data: dict = Depends(verify_token)):
         return {"message": "Access granted", "account_id": account_id, "account_object": account_object}
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token.")
+
+# @router.get("/protected")
+# async def protected_route(request: Request):
+#     authorization_header = request.headers.get("authorization")
+#     logging.debug(f"Authorization header: {authorization_header}")
+#     return {"message": "Authorization header logged"}
+
 
 @router.post("/logout")
 async def logout(token: str = Depends(verify_token)):

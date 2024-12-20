@@ -172,6 +172,7 @@ async def get_bills(page: int = 1, limit: int = 10, token_data: dict = Depends(v
     await create_custom_log(
         event= "get bills",
         user_id = user_id,
+        objectid=None,
         account_id = user_id,
         page_number= page
     )

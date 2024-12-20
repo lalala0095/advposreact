@@ -8,6 +8,8 @@ from app.core.auth import verify_token, oauth2_scheme
 import logging
 from datetime import datetime
 from app.core.custom_logging import create_custom_log
+from typing import List, Dict
+import math
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -100,6 +102,7 @@ async def delete_cash_flow(cash_flow_id: str, token_data: dict = Depends(verify_
     await create_custom_log(
         event= "delete cash_flow",
         user_id = user_id,
+        objectid=None,
         old_doc=old_doc
     )
     # Check if the document was deleted
@@ -110,3 +113,48 @@ async def delete_cash_flow(cash_flow_id: str, token_data: dict = Depends(verify_
         )
 
     return {"message": "Cash Flow deleted successfully"}
+
+@router.get("/", response_model=Dict[str, object])
+async def get_cash_flows(page: int = 1, limit: int = 10, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
+
+    if limit > 10:
+        limit = 10
+
+    # Calculate the skip value based on the page and limit
+    skip = (page - 1) * limit
+
+    # Fetch the paginated data from MongoDB
+    cash_flows = await db.cash_flows.find().skip(skip).limit(limit).to_list(length=limit)
+    for i in cash_flows:
+        i['_id'] = str(i['_id'])
+
+    total_count = await db.cash_flows.count_documents({})
+    total_pages = math.ceil(total_count / limit)
+
+    # Check if no cash_flows were found
+    if not cash_flows:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No cash_flows found"
+        )
+
+    await create_custom_log(
+        event= "get cash_flows",
+        user_id = user_id,
+        objectid=None,
+        account_id = user_id,
+        page_number= page
+    )
+        
+    return {
+        "response": {
+            "limit": limit,
+            "page": page,
+            "total_pages": total_pages,
+            "total_items": total_count,
+            "items": cash_flows
+        }
+    }
+    
