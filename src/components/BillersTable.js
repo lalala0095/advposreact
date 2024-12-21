@@ -150,7 +150,7 @@ const DeleteButton = styled.button`
   font-size: 18px;
 `;
 
-const BillersTable = () => {
+const BillersTable = ({ handleFlashMessage }) => {
   const [billers, setBillers] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -200,9 +200,11 @@ const BillersTable = () => {
       setBillers(billers.filter(biller => biller._id !== billerId));
   
       // Redirect to billers page with success message after deletion
-      navigate('/billers', {
-        state: { message: 'Biller deleted successfully' },
-      });
+      // navigate('/billers', {
+      //   state: { message: 'Biller deleted successfully' },
+      // });
+
+      handleFlashMessage("Biller deleted successfully");
     } catch (error) {
       console.error('Error deleting biller:', error);
     }

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BillersTable from '../components/BillersTable';
 import styled from 'styled-components';
+import FlashMessage from '../components/FlashMessage'; // Import FlashMessage component
 
 const PageContainer = styled.div`
   display: flex;
@@ -15,11 +16,25 @@ const ContentContainer = styled.div`
 `;
 
 const BillersPage = ({ sidebarOpen }) => {
+  // Local state to manage flash messages
+  const [flashMessage, setFlashMessage] = useState('');
+
+  // Function to set flash message
+  const handleFlashMessage = (message) => {
+    setFlashMessage(message);
+
+    // Automatically hide the message after 3 seconds (for example)
+    setTimeout(() => {
+      setFlashMessage('');
+    }, 3000);
+  };
+
   return (
     <PageContainer>
       <ContentContainer sidebarOpen={sidebarOpen}>
         <h1>Manage Billers</h1>
-        <BillersTable />
+        {flashMessage && <FlashMessage message={flashMessage} />} {/* Display flash message if it exists */}
+        <BillersTable handleFlashMessage={handleFlashMessage} />
       </ContentContainer>
     </PageContainer>
   );
