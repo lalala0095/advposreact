@@ -97,8 +97,8 @@ async def update_biller(biller_id: str, updated_biller: Biller, token_data: dict
 async def delete_biller(biller_id: str, token_data: dict = Depends(verify_token)):
     user_id = token_data['account_id']
     payload = token_data['payload']
-    print(f"Received token: {payload['token']}")
-    logging.debug(f"Received token: {payload['token']}")
+    print(f"Received token: {token_data['account_object']['token']}")
+    logging.debug(f"Received token: {token_data['account_object']['token']}")
 
     existing_biller = await db.billers.find_one({"_id": ObjectId(biller_id)})
     

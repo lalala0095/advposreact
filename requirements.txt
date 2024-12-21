@@ -9,10 +9,11 @@ pydantic-settings
 itsdangerous
 python-jose
 bcrypt
-passlib
+passlib[argon2]
 requests
 redis
 pydantic-settings
 pyjwt==1.7.1
 aioredis
 boto3
+argon2_cffi
