@@ -13,6 +13,7 @@ import Login from './pages/Login';
 import AuthProvider from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Billers from './pages/Billers';
+import EditBillerPage from './pages/EditBiller';
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -47,6 +48,7 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
+                <Route path="/edit-biller/:billerId" element={<EditBillerPage />} />
                 <Route
                   path="/reports"
                   element={

@@ -110,45 +110,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { FaTrashAlt } from 'react-icons/fa'; // Import trash icon
+import { FaTrashAlt, FaPenSquare } from 'react-icons/fa'; // Import trash icon
 import { useNavigate } from 'react-router-dom'; // Import navigate for redirection
-
-const TableWrapper = styled.div`
-  padding: 20px;
-  width: 100%;
-  overflow-x: auto;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-`;
-
-const TableHeader = styled.th`
-  padding: 10px;
-  background-color: #f4f4f4;
-  border: 1px solid #ddd;
-`;
-
-const TableRow = styled.tr`
-  &:hover {
-    background-color: #f1f1f1;
-  }
-`;
-
-const TableData = styled.td`
-  padding: 10px;
-  border: 1px solid #ddd;
-`;
-
-const DeleteButton = styled.button`
-  background: none;
-  border: none;
-  color: red;
-  cursor: pointer;
-  font-size: 18px;
-`;
+import { TableWrapper, Table, TableHeader, TableRow, TableData, EditButton, DeleteButton, PaginationControl } from '../styles/BillersTable';
 
 const BillersTable = ({ handleFlashMessage }) => {
   const [billers, setBillers] = useState([]);
@@ -210,6 +174,11 @@ const BillersTable = ({ handleFlashMessage }) => {
     }
   };
 
+  const handleEdit = (billerId) => {
+    // Navigate to the edit page for the selected biller
+    navigate(`/edit-biller/${billerId}`);
+  };
+
   return (
     <TableWrapper>
       <h2>Billers List</h2>
@@ -219,6 +188,7 @@ const BillersTable = ({ handleFlashMessage }) => {
             <TableHeader>Biller Name</TableHeader>
             <TableHeader>Biller Type</TableHeader>
             <TableHeader>Amount</TableHeader>
+            <TableHeader>Amount Type</TableHeader>
             <TableHeader>Due Date</TableHeader>
             <TableHeader>Remarks</TableHeader>
             <TableHeader>Actions</TableHeader> {/* Add Actions column */}
@@ -230,9 +200,13 @@ const BillersTable = ({ handleFlashMessage }) => {
               <TableData>{biller.biller_name}</TableData>
               <TableData>{biller.biller_type}</TableData>
               <TableData>{biller.amount}</TableData>
+              <TableData>{biller.amount_type}</TableData>
               <TableData>{biller.usual_due_date_day}</TableData>
               <TableData>{biller.remarks}</TableData>
               <TableData>
+                <EditButton onClick={() => handleEdit(biller._id)}>
+                  <FaPenSquare />
+                </EditButton>
                 <DeleteButton onClick={() => handleDelete(biller._id)}>
                   <FaTrashAlt />
                 </DeleteButton>
@@ -242,7 +216,7 @@ const BillersTable = ({ handleFlashMessage }) => {
         </tbody>
       </Table>
       {/* Pagination controls */}
-      <div>
+      <PaginationControl>
         {currentPage > 1 && (
           <button onClick={() => handlePageChange(currentPage - 1)}>Previous</button>
         )}
@@ -250,7 +224,7 @@ const BillersTable = ({ handleFlashMessage }) => {
         {currentPage < totalPages && (
           <button onClick={() => handlePageChange(currentPage + 1)}>Next</button>
         )}
-      </div>
+      </PaginationControl>
     </TableWrapper>
   );
 };
