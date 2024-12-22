@@ -20,9 +20,9 @@ class Biller(BaseModel):
     biller_type: BillerType = Field(..., description="Choose if it the amount changes or not")
     amount_type: AmountType = Field(..., description="Choose if it the amount changes or not")
     amount: float = Field(0, ge=0, description="Amount (Leave Blank if Amount Type = Changing)")
-    custom_type: str = Field(..., max_length=255, description="Custom Type")
-    usual_due_date_day: int = Field(1, ge=1, le=31, description="Usual Due Date Day")
-    remarks: str = Field(..., max_length=500, description="Remarks")
+    custom_type: Optional[str] = Field(..., max_length=255, description="Custom Type")
+    usual_due_date_day: Optional[int] = Field(1, ge=1, le=31, description="Usual Due Date Day")
+    remarks: Optional[str] = Field(..., max_length=500, description="Remarks")
 
 fields = ['need', 'want']
 ExpenseType = Enum(

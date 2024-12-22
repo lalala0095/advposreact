@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from app.core.database import db
-from app.models.expenses import Biller
+from app.core.database import db, redis_client
+from app.models.expenses import Biller, BillerType, AmountType
 import pandas as pd
 from bson import ObjectId
 from app.core.auth import verify_token
@@ -9,15 +9,17 @@ from datetime import datetime
 from typing import Dict
 import math
 from app.core.custom_logging import create_custom_log
+import json
 
 router = APIRouter()
 
 @router.post("/")
 async def create_biller(biller: Biller, token_data: dict = Depends(verify_token)):
+    print(biller)
     user_id = token_data['account_id']
     payload = token_data['payload']
     biller_data = {
-        "date_inserted": datetime.now(),
+        "date_added": datetime.now(),
         "user_id": user_id,
         "biller_name": biller.biller_name,
         "biller_type": biller.biller_type.value,
@@ -47,6 +49,7 @@ async def create_biller(biller: Biller, token_data: dict = Depends(verify_token)
 
 @router.put("/{biller_id}")
 async def update_biller(biller_id: str, updated_biller: Biller, token_data: dict = Depends(verify_token)):
+    print(updated_biller)
     user_id = token_data['account_id']
     payload = token_data['payload']
 
@@ -61,7 +64,12 @@ async def update_biller(biller_id: str, updated_biller: Biller, token_data: dict
 
     # Convert Pydantic model to dictionary and process the date field
     updated_data = updated_biller.dict()
-    updated_data["date_added"] = pd.to_datetime(updated_data["date_added"])
+    
+    if "date_added" not in updated_data:
+        updated_data["date_added"] = datetime.now()
+    else:
+        updated_data["date_added"] = pd.to_datetime(updated_data['date_added'])
+
     updated_data["date_updated"] = datetime.now()
     updated_data["biller_type"] = updated_data["biller_type"].value
     updated_data["amount_type"] = updated_data["amount_type"].value
@@ -178,4 +186,56 @@ async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends
             "items": billers
         }
     }
+    
+@router.get("/get_biller/{biller_id}", response_model=Dict[str, Dict[str, object]])
+async def get_biller(biller_id: str, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
+
+    biller = await db.billers.find_one({"_id": ObjectId(biller_id)})
+    biller["_id"] = str(biller['_id'])
+    biller['date_added'] = biller['date_added'].strftime('%Y-%m-%d')
+    # Check if no billers were found
+    if not biller:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No biller found"
+        )
+    
+    await create_custom_log(
+        event= "get one biller",
+        user_id = user_id,
+        account_id = user_id,
+        objectid=None,
+        page_number= None,
+        new_doc = None,
+        error= None
+    )
+    
+    return {
+        "response": {
+            "item": biller
+        }
+    }
+    
+@router.get("/get_options", response_model=Dict[str, Dict[str, object]])
+async def get_options(token_data: dict = Depends(verify_token)):
+    cached_options = await redis_client.get('billers_options')
+    
+    if cached_options:
+        # Return from cache if available
+        return json.loads(cached_options)
+
+    # If not in cache, generate options
+    options = {
+        "response": {
+            "biller_types": [biller_type.value for biller_type in BillerType],
+            "amount_types": [amount_type.value for amount_type in AmountType]
+        }
+    }
+    
+    # Cache the options for future use (no expiration)
+    redis_client.set('billers_options', json.dumps(options), ex=0)  # Set expiration to 0 (no expiration)
+    
+    return options
     

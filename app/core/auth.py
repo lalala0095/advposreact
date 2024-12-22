@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2AuthorizationCodeBearer
 import logging
 import redis.asyncio as redis
 from datetime import datetime, timedelta
-from app.core.database import db
+from app.core.database import db, redis_client
 from bson import ObjectId
 import json
 import pandas as pd
@@ -18,9 +18,6 @@ SECRET_KEY = settings.secret_key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/accounts/login", scopes={"read": "Read access", "write": "Write access"})
-
-# Use a single Redis client with async support
-redis_client = redis.from_url(f"{settings.redis_url}", decode_responses=True)
 
 def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))

@@ -21,7 +21,7 @@ serializer = URLSafeSerializer(settings.secret_key)  # Replace with your secret 
 origins = [
     "http://localhost:3000",
     "http://120.29.98.34:3000",
-    "http://127.0.0.1:3000/"
+    "http://127.0.0.1:3000"
 ]
 
 def custom_openapi():
