@@ -8,7 +8,7 @@ export const AmountTypeDropdown = ({ value, onChange }) => {
   useEffect(() => {
     const fetchAmountTypes = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/billers/get_options`, {
+        const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/get_options`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -41,35 +41,35 @@ export const AmountTypeDropdown = ({ value, onChange }) => {
   );
 };
 
-export const BillerTypeDropdown = ({ value, onChange }) => {
+export const CashFlowTypeDropdown = ({ value, onChange }) => {
   const [options, setOptions] = useState([]);
 
   useEffect(() => {
-    const fetchBillerTypes = async () => {
+    const fetchCashFlowTypes = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/billers/get_options`, {
+        const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/get_options`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-        setOptions(response.data.response.biller_types);
+        setOptions(response.data.response.cash_flow_types);
       } catch (error) {
-        console.error("Error fetching biller types:", error);
+        console.error("Error fetching cash_flow types:", error);
       }
     };
 
-    fetchBillerTypes();
+    fetchCashFlowTypes();
   }, []);
 
   return (
     <DropdownWrapper>
       <select
-        name="biller_type"
+        name="cash_flow_type"
         value={value || ""}
         onChange={onChange}
         className="form-select"
       >
-        <option value="">Select Biller Type</option>
+        <option value="">Select CashFlow Type</option>
         {options.map((option) => (
           <option key={option} value={option}>
             {option.charAt(0).toUpperCase() + option.slice(1)} {/* Capitalize */}

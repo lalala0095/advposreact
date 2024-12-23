@@ -1,5 +1,5 @@
 // FlashMessage.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const FlashMessageWrapper = styled.div`
@@ -11,8 +11,30 @@ const FlashMessageWrapper = styled.div`
   text-align: center;
 `;
 
-const FlashMessage = ({ message }) => (
-  <FlashMessageWrapper>{message}</FlashMessageWrapper>
-);
+const FlashMessage = ({ message }) => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (message) {
+      setIsVisible(true);
+
+      // Hide the message after 3 seconds
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 3000);
+
+      // Cleanup the timeout on unmount
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  if (!isVisible || !message) return null;
+
+  return (
+    <FlashMessageWrapper>
+      <p>{message}</p>
+    </FlashMessageWrapper>
+  );
+};
 
 export default FlashMessage;

@@ -44,7 +44,7 @@ const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error("No token found");
 
-      const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/v1/accounts/protected`, {
+      const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/accounts/protected`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

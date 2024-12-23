@@ -110,6 +110,10 @@ const Sidebar = ({ onSidebarToggle }) => {
         <FaHandHoldingUsd />
         {isSidebarOpen && 'Billers'}
       </MenuItem>
+      <MenuItem to="/cash_flows" isSidebarOpen={isSidebarOpen}>
+        <FaHandHoldingUsd />
+        {isSidebarOpen && 'Cash Flows'}
+      </MenuItem>
       <MenuItem to="/reports" isSidebarOpen={isSidebarOpen}>
         <FaChartBar />
         {isSidebarOpen && 'Reports'}

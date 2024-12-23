@@ -2,21 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FormWrapper, FormRow, Label, InputField, TextArea, SubmitButton, PageContainer, ContentContainer } from "../styles/BillersStyles";
-import { AmountTypeDropdown, BillerTypeDropdown } from "../components/BillersDropdowns";
+import { AmountTypeDropdown, CashFlowTypeDropdown } from "../components/CashFlowsDropdowns";
 import FlashMessage from "../components/FlashMessage";
-import useBillers from "../hooks/useBillers";
+import useCashFlows from "../hooks/useCashFlows";
 
-const EditBillerPage = () => {
+const EditCashFlow = () => {
   const [flashMessage, setFlashMessage] = useState('');
-  const { billerId } = useParams();
-  const { billers, loading, error } = useBillers(1); // Assuming useBillers hook fetches billers
+  const { cash_flowId } = useParams();
+  const { cash_flows, loading, error } = useCashFlows(1); // Assuming useCashFlows hook fetches cash_flows
   const navigate = useNavigate();
 
-  const [billerData, setBillerData] = useState(null);
+  const [cash_flowData, setCashFlowData] = useState(null);
 
   const [formData, setFormData] = useState({
-    biller_name: "",
-    biller_type: "",
+    cash_flow_name: "",
+    cash_flow_type: "",
     amount_type: "",
     amount: "",
     custom_type: "",
@@ -28,27 +28,27 @@ const EditBillerPage = () => {
     setFlashMessage(message);
   };
 
-  // Set the biller data when fetched
+  // Set the cash_flow data when fetched
   useEffect(() => {
-    if (billerId && billers.length > 0) {
-      const selectedBiller = billers.find(biller => biller._id === billerId);
-      setBillerData(selectedBiller);
+    if (cash_flowId && cash_flows.length > 0) {
+      const selectedCashFlow = cash_flows.find(cash_flow => cash_flow._id === cash_flowId);
+      setCashFlowData(selectedCashFlow);
     }
-  }, [billerId, billers]);
+  }, [cash_flowId, cash_flows]);
 
-  // Set formData when billerData is available
+  // Set formData when cash_flowData is available
   useEffect(() => {
-    if (billerData) {
+    if (cash_flowData) {
       setFormData({
-        biller_name: billerData.biller_name,
-        biller_type: billerData.biller_type,
-        amount_type: billerData.amount_type,
-        amount: billerData.amount,
-        usual_due_date_day: billerData.usual_due_date_day,
-        remarks: billerData.remarks,
+        cash_flow_name: cash_flowData.cash_flow_name,
+        cash_flow_type: cash_flowData.cash_flow_type,
+        amount_type: cash_flowData.amount_type,
+        amount: cash_flowData.amount,
+        usual_due_date_day: cash_flowData.usual_due_date_day,
+        remarks: cash_flowData.remarks,
       });
     }
-  }, [billerData]);
+  }, [cash_flowData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,7 +70,7 @@ const EditBillerPage = () => {
       }
   
       const result = await axios.put(
-        `${process.env.REACT_APP_FASTAPI_URL}/billers/${billerId}`,
+        `${process.env.REACT_APP_FASTAPI_URL}/cash_flows/${cash_flowId}`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -78,7 +78,7 @@ const EditBillerPage = () => {
       );
       handleFlashMessage(result.data.response.message + " Redirecting. . .");
       setTimeout(() => {
-        navigate("/billers");
+        navigate("/cash_flows");
       }, 2000);
     } catch (error) {
       // Log the error message for debugging
@@ -91,41 +91,47 @@ const EditBillerPage = () => {
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading billers data</div>;
+  if (error) return <div>Error loading cash_flows data</div>;
 
   return (
     <PageContainer>
       <ContentContainer>
         {flashMessage && <FlashMessage message={flashMessage} />}
         <FormWrapper>
-          <h2 className="text-center mb-4">Edit Biller</h2>
+          <h2 className="text-center mb-4">Edit CashFlow</h2>
           <form onSubmit={handleSubmit}>
-            {[
-              { label: "Biller Name", name: "biller_name", type: "text" },
-              { label: "Amount", name: "amount", type: "number" },
-              { label: "Usual Due Date Day", name: "usual_due_date_day", type: "number" },
-            ].map(({ label, name, type }) => (
-              <FormRow key={name}>
-                <Label htmlFor={name}>{label}:</Label>
-                <InputField
-                  type={type}
-                  name={name}
-                  value={formData[name] || ""}
-                  onChange={handleChange}
-                />
-              </FormRow>
-            ))}
             <FormRow>
-              <Label htmlFor="amount_type">Amount Type</Label>
-              <AmountTypeDropdown
-                value={formData.amount_type}
+              <Label htmlFor="cash_flow_name">Cash Flow Name</Label>
+              <InputField
+                value={formData.cash_flow_name}
                 onChange={handleChange}
               />
             </FormRow>
             <FormRow>
-              <Label htmlFor="biller_type">Biller Type</Label>
-              <BillerTypeDropdown
-                value={formData.biller_type}
+              <Label htmlFor="cash_flow_type">Cash Flow Type</Label>
+              <CashFlowTypeDropdown
+                value={formData.cash_flow_type}
+                onChange={handleChange}
+              />
+            </FormRow>
+            <FormRow>
+              <Label htmlFor="custom_type">Custom Type</Label>
+              <InputField
+                value={formData.custom_type}
+                onChange={handleChange}
+              />
+            </FormRow>
+            <FormRow>
+              <Label htmlFor="amount">Amount</Label>
+              <InputField
+                value={formData.amount}
+                onChange={handleChange}
+              />
+            </FormRow>
+            <FormRow>
+              <Label htmlFor="platform">Platform</Label>
+              <InputField
+                value={formData.custom_type}
                 onChange={handleChange}
               />
             </FormRow>
@@ -145,4 +151,4 @@ const EditBillerPage = () => {
   );
 };
 
-export default EditBillerPage;
+export default EditCashFlow;

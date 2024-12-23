@@ -1,54 +1,13 @@
-// import React, { useState } from 'react';
-// import BillersTable from '../components/BillersTable';
-// import styled from 'styled-components';
-// import FlashMessage from '../components/FlashMessage'; // Import FlashMessage component
-
-// const PageContainer = styled.div`
-//   display: flex;
-//   height: 100vh;
-// `;
-
-// const ContentContainer = styled.div`
-//   flex-grow: 1;
-//   padding: 20px;
-//   margin-left: ${({ sidebarOpen }) => (sidebarOpen ? '250px' : '0')}; /* Adjust for sidebar */
-//   transition: margin-left 0.3s ease-in-out;
-// `;
-
-// const BillersPage = ({ sidebarOpen }) => {
-//   // Local state to manage flash messages
-//   const [flashMessage, setFlashMessage] = useState('');
-
-//   // Function to set flash message
-//   const handleFlashMessage = (message) => {
-//     setFlashMessage(message);
-
-//     // Automatically hide the message after 3 seconds (for example)
-//     setTimeout(() => {
-//       setFlashMessage('');
-//     }, 3000);
-//   };
-
-//   return (
-//     <PageContainer>
-//       <ContentContainer sidebarOpen={sidebarOpen}>
-//         <h1>Manage Billers</h1>
-//         {flashMessage && <FlashMessage message={flashMessage} />} {/* Display flash message if it exists */}
-//         <BillersTable handleFlashMessage={handleFlashMessage} />
-//       </ContentContainer>
-//     </PageContainer>
-//   );
-// };
-
-// export default BillersPage;
-
-import React, { useState, useEffect } from 'react';
+// pages/BillersPage.js
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BillersTable from '../components/BillersTable';
-import FlashMessage from '../components/FlashMessage';
-import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton } from '../styles/Billers'
+import FlashMessage from '../components/FlashMessage'; // Import the new FlashMessage component
+import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton } from '../styles/BillersStyles'
 import { AmountTypeDropdown, BillerTypeDropdown } from '../components/BillersDropdowns';
 
 const BillersPage = ({ sidebarOpen }) => {
+  const navigate = useNavigate();
   const [flashMessage, setFlashMessage] = useState('');
   const [showForm, setShowForm] = useState(false); // State to toggle the form visibility
   const [formData, setFormData] = useState({
@@ -63,10 +22,6 @@ const BillersPage = ({ sidebarOpen }) => {
 
   const handleFlashMessage = (message) => {
     setFlashMessage(message);
-
-    setTimeout(() => {
-      setFlashMessage('');
-    }, 3000);
   };
 
   const handleAddBiller = async (e) => {
@@ -79,9 +34,9 @@ const BillersPage = ({ sidebarOpen }) => {
       custom_type: formData.custom_type,
       amount: formData.amount,
       amount_type: formData.amount_type,
+      usual_due_date_day: formData.usual_due_date_day,
       remarks: formData.remarks,
     };
-
     if (formData.usual_due_date_day === '') {
       delete billerData.usual_due_date_day;
     }
@@ -94,15 +49,17 @@ const BillersPage = ({ sidebarOpen }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(billerData), // Send the form data as JSON
+        body: JSON.stringify(billerData),
       });
-
       const result = await response.json();
   
       if (response.ok) {
         // Success - Handle the response from FastAPI
-        console.log('New biller added:', result.response);
-        handleFlashMessage(result.response.message); // Display the success message
+        handleFlashMessage(result.data.message + " Redirecting. . .");
+        setTimeout(() => {
+          navigate("/billers");
+        }, 2000);
+  
       } else {
         // Error - Handle error response from FastAPI
         const errorDetail = result.response?.detail || 'Something went wrong';
@@ -142,13 +99,13 @@ const BillersPage = ({ sidebarOpen }) => {
             {showForm ? 'Cancel' : 'Add New Biller'}
           </AddButton>
         </Header>
-        {flashMessage && <FlashMessage message={flashMessage} />}
+        {flashMessage && <FlashMessage message={flashMessage} />} {/* Use the FlashMessage component here */}
         <BillersTable handleFlashMessage={handleFlashMessage} />
         {showForm && (
           <FormWrapper onSubmit={handleAddBiller}>
-            <h3>Add New Biller</h3>
+            <h3>Add New Biller*</h3>
             <FormRow>
-              <label htmlFor="biller_name">Biller Name</label>
+              <label htmlFor="biller_name">Biller Name*</label>
               <input
                 id="biller_name"
                 name="biller_name"
@@ -156,29 +113,8 @@ const BillersPage = ({ sidebarOpen }) => {
                 onChange={handleChange}
               />
             </FormRow>
-            {/* {[
-              { label: 'Biller Name', name: 'biller_name', type: 'text' },
-              { label: 'Custom Type', name: 'custom_type', type: 'text' },
-              { label: 'Amount', name: 'amount', type: 'number' },
-              {
-                label: 'Usual Due Date Day',
-                name: 'usual_due_date_day',
-                type: 'number',
-              },
-            ].map(({ label, name, type }) => (
-              <FormRow key={name}>
-                <label htmlFor={name}>{label}</label>
-                <input
-                  id={name}
-                  name={name}
-                  type={type}
-                  value={formData[name] || ''}
-                  onChange={handleChange}
-                />
-              </FormRow>
-            ))} */}
             <FormRow>
-              <label htmlFor="biller_type">Biller Type</label>
+              <label htmlFor="biller_type">Biller Type*</label>
               <BillerTypeDropdown
                 value={formData.biller_type}
                 onChange={(e) => handleChange(e)}
@@ -194,7 +130,7 @@ const BillersPage = ({ sidebarOpen }) => {
               />
             </FormRow>
             <FormRow>
-              <label htmlFor="amount">Amount</label>
+              <label htmlFor="amount">Amount*</label>
               <input
                 id="amount"
                 name="amount"
@@ -214,7 +150,7 @@ const BillersPage = ({ sidebarOpen }) => {
               />
             </FormRow>             
             <FormRow>
-              <label htmlFor="amount_type">Amount Type</label>
+              <label htmlFor="amount_type">Amount Type*</label>
               <AmountTypeDropdown
                 value={formData.amount_type}
                 onChange={(e) => handleChange(e)}

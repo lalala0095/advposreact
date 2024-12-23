@@ -14,6 +14,8 @@ import AuthProvider from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Billers from './pages/Billers';
 import EditBillerPage from './pages/EditBiller';
+import CashFlows from './pages/CashFlows';
+import EditCashFlow from './pages/EditCashFlow';
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -49,6 +51,15 @@ const App = () => {
                   }
                 />
                 <Route path="/edit-biller/:billerId" element={<EditBillerPage />} />
+                <Route
+                  path="/cash_flows"
+                  element={
+                    <ProtectedRoute>
+                      <CashFlows />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/edit-cash-flow/:cashFlowId" element={<EditCashFlow />} />
                 <Route
                   path="/reports"
                   element={
