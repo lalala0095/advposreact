@@ -28,49 +28,58 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <Router>
-          <AppWrapper>
-            <Sidebar onSidebarToggle={handleSidebarToggle} />
-            <ContentWrapper isSidebarOpen={isSidebarOpen}>
-              <Header />
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/billers"
-                  element={
-                    <ProtectedRoute>
-                      <Billers />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/edit-biller/:billerId" element={<EditBillerPage />} />
-                <Route
-                  path="/cash_flows"
-                  element={
-                    <ProtectedRoute>
-                      <CashFlows />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/edit-cash-flow/:cashFlowId" element={<EditCashFlow />} />
-                <Route
-                  path="/reports"
-                  element={
-                    <ProtectedRoute>
-                      <Reports />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </ContentWrapper>
-          </AppWrapper>
+            <AppWrapper>
+              <Sidebar onSidebarToggle={handleSidebarToggle} />
+              <ContentWrapper isSidebarOpen={isSidebarOpen}>
+                <Header />
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/edit-biller/:billerId" element={<EditBillerPage />} />
+                  <Route
+                    path="/billers"
+                    element={
+                      <ProtectedRoute>
+                        <Billers />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/edit-biller/:billerId" element={<EditBillerPage />} />
+                  <Route
+                    path="/cash_flows"
+                    element={
+                      <ProtectedRoute>
+                        <CashFlows />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/edit-cash-flow/:cashFlowId" element={<EditCashFlow />} />
+                  <Route
+                    path="/reports"
+                    element={
+                      <ProtectedRoute>
+                        <Reports />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </ContentWrapper>
+            </AppWrapper>
         </Router>
       </AuthProvider>
     </ThemeProvider>

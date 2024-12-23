@@ -1,15 +1,16 @@
 // pages/CashFlowsPage.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import CashFlowsTable from '../components/CashFlowsTable';
 import FlashMessage from '../components/FlashMessage'; // Import the new FlashMessage component
 import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, Label, InputField, TextArea, DateInputField } from '../styles/BillersStyles'
-import { AmountTypeDropdown, CashFlowTypeDropdown } from '../components/CashFlowsDropdowns';
+import { CashFlowTypeDropdown } from '../components/CashFlowsDropdowns';
+import useCashFlows from '../hooks/useCashFlows';
+import { useNavigate } from 'react-router-dom';
 
 const CashFlowsPage = ({ sidebarOpen }) => {
   const navigate = useNavigate();
   const [flashMessage, setFlashMessage] = useState('');
-  const [showForm, setShowForm] = useState(false); // State to toggle the form visibility
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     date_of_transaction: '',
     cash_flow_name: '',
@@ -20,6 +21,8 @@ const CashFlowsPage = ({ sidebarOpen }) => {
     payment_method: '',
     remarks: '',
   });
+
+  const { cash_flows, totalPages, loading, error, refreshData } = useCashFlows(1);
 
   const handleFlashMessage = (message) => {
     setFlashMessage(message);
@@ -58,8 +61,27 @@ const CashFlowsPage = ({ sidebarOpen }) => {
   
       if (response.ok) {
         // Success - Handle the response from FastAPI
-        handleFlashMessage(result.message);
-        navigate("/cash_flows", { state: { message: "CashFlow added successfully" } });
+        handleFlashMessage(result.message + ". Please wait for the data refresh.");
+        setFormData({
+          date_of_transaction: '',
+          cash_flow_name: '',
+          cash_flow_type: '',
+          custom_type: '',
+          amount: '',
+          platform: '',
+          payment_method: '',
+          remarks: '',
+        });
+        setShowForm(false);
+        setTimeout(() => {
+          console.log("refreshing data");
+          refreshData();
+          // <ForceRerender />
+          console.log("navigating");
+          navigate("/cash_flows");
+          // window.location.href = "/cash_flows"; 
+        }, 1000);
+        // navigate("/cash_flows");
       } else {
         // Error - Handle error response from FastAPI
         const errorDetail = result?.detail || 'Something went wrong';
@@ -108,8 +130,10 @@ const CashFlowsPage = ({ sidebarOpen }) => {
             {showForm ? 'Cancel' : 'Add New Cash Flow'}
           </AddButton>
         </Header>
-        {flashMessage && <FlashMessage message={flashMessage} />} {/* Use the FlashMessage component here */}
-        <CashFlowsTable handleFlashMessage={handleFlashMessage} />
+        {flashMessage && <FlashMessage message={flashMessage} />}
+        {loading && <p>Loading...</p>}
+        {error && <p>Error: {error.message}</p>}
+        <CashFlowsTable cashFlows={cash_flows} totalPages={totalPages} handleFlashMessage={handleFlashMessage} />
         {showForm && (
         <FormWrapper>
           <h2 className="text-center mb-4">Add Cash Flow</h2>

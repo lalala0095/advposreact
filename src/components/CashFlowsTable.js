@@ -11,12 +11,12 @@ const CashFlowsTable = ({ handleFlashMessage }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const navigate = useNavigate();
   
-  const { cash_flows, totalPages, loading, error } = useCashFlows(currentPage); // Use the hook
+  const { cash_flows, totalPages, loading, error, refreshData } = useCashFlows(currentPage); 
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
-
+  
   const handleDelete = async (cashFlowId) => {
     try {
       const token = localStorage.getItem('token');
@@ -25,10 +25,12 @@ const CashFlowsTable = ({ handleFlashMessage }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
       handleFlashMessage('CashFlow deleted successfully');
+      refreshData(); // Refresh the data after deletion
     } catch (error) {
       console.error('Error deleting cash_flow:', error);
+      handleFlashMessage('Failed to delete cash flow. Please try again.');
     }
   };
 
@@ -42,7 +44,7 @@ const CashFlowsTable = ({ handleFlashMessage }) => {
   return (
     <TableWrapper>
       <h2>Cash Flows List</h2>
-      <Table>
+      <Table key={currentPage}>
         <thead>
           <tr>
             <TableHeader>Date Added</TableHeader>
