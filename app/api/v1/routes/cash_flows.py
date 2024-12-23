@@ -128,7 +128,7 @@ async def get_cash_flows(page: int = 1, limit: int = 10, token_data: dict = Depe
     skip = (page - 1) * limit
 
     # Fetch the paginated data from MongoDB
-    cash_flows = await db.cash_flows.find().skip(skip).limit(limit).to_list(length=limit)
+    cash_flows = await db.cash_flows.find().sort({"date_added": -1}).skip(skip).limit(limit).to_list(length=limit)
     new_cash_flows = []
     for i in cash_flows:
         i['_id'] = str(i['_id'])
