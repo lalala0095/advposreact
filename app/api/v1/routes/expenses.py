@@ -23,7 +23,7 @@ async def create_expense(expense: Expenses, token_data: dict = Depends(verify_to
     user_id = token_data['account_id']
     payload = token_data['payload']
     expense_data = {
-        "date_inserted": datetime.now(),
+        "date_added": datetime.now(),
         "user_id": user_id,
         "date_of_transaction": pd.to_datetime(expense.date_of_transaction),
         "description": expense.description,

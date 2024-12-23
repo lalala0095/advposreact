@@ -31,7 +31,7 @@ async def create_bill(bill: Bill, token_data: dict = Depends(verify_token)):
         biller_object = await get_biller_object(bill.biller_object_id)
 
         bill_data = {
-            "date_inserted": datetime.now(),
+            "date_added": datetime.now(),
             "user_id": user_id,
             "biller": biller_object,
             "total_amount_due": bill.total_amount_due,

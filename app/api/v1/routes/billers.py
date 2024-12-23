@@ -44,7 +44,11 @@ async def create_biller(biller: Biller, token_data: dict = Depends(verify_token)
         error= None
     )
 
-    return {"message": "Biller created successfully", "object_id": object_id}
+    return { 
+        "response": {
+            "message": "Biller created successfully", "object_id": object_id
+        }
+    }
 
 
 @router.put("/{biller_id}")
@@ -65,11 +69,7 @@ async def update_biller(biller_id: str, updated_biller: Biller, token_data: dict
     # Convert Pydantic model to dictionary and process the date field
     updated_data = updated_biller.dict()
     
-    if "date_added" not in updated_data:
-        updated_data["date_added"] = datetime.now()
-    else:
-        updated_data["date_added"] = pd.to_datetime(updated_data['date_added'])
-
+    updated_data["date_added"] = existing_biller['date_added']
     updated_data["date_updated"] = datetime.now()
     updated_data["biller_type"] = updated_data["biller_type"].value
     updated_data["amount_type"] = updated_data["amount_type"].value
@@ -99,7 +99,9 @@ async def update_biller(biller_id: str, updated_biller: Biller, token_data: dict
             detail="Biller not found"
         )
 
-    return {"message": "Biller updated successfully"}
+    return { "response": {
+        "message": "Biller updated successfully."}
+    } 
 
 @router.delete("/{biller_id}")
 async def delete_biller(biller_id: str, token_data: dict = Depends(verify_token)):
@@ -153,20 +155,22 @@ async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends
     skip = (page - 1) * limit
 
     # Fetch the paginated data from MongoDB
-    billers = await db.billers.find().skip(skip).limit(limit).to_list(length=limit)
-    for i in billers:
-        i['_id'] = str(i['_id'])
-
-    total_count = await db.billers.count_documents({})
-    total_pages = math.ceil(total_count / limit)
-
-    # Check if no billers were found
+    billers = await db.billers.find().skip(skip).limit(limit).to_list(length=limit)  
     if not billers:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No billers found"
-        )
+        )  
     
+    billers_sorted = sorted(billers, key=lambda x: x['date_added'], reverse=True)
+
+    for i in billers_sorted:
+        i['_id'] = str(i['_id'])
+        i['date_added'] = i['date_added'].strftime("%b %d, %Y")
+        
+    total_count = await db.billers.count_documents({})
+    total_pages = math.ceil(total_count / limit)
+   
     await create_custom_log(
         event= "get billers",
         user_id = user_id,
@@ -183,7 +187,7 @@ async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends
             "page": page,
             "total_pages": total_pages,
             "total_items": total_count,
-            "items": billers
+            "items": billers_sorted
         }
     }
     

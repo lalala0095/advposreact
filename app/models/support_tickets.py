@@ -6,13 +6,13 @@ from datetime import date
 fields = ['feedback', 'support_ticket']
 TicketType = Enum(
     "SupportTicketType",
-    {field: field.replace('_', '').title() for field in fields}
+    {field: field.replace('_', ' ').title() for field in fields}
 )
 
 fields = ['urgent', 'normal', 'low']
 Urgency = Enum(
     "Urgency",
-    {field: field.replace('_', '').title() for field in fields}
+    {field: field.replace('_', ' ').title() for field in fields}
 )
 
 class SupportTicket(BaseModel):

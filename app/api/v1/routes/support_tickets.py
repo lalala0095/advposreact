@@ -54,7 +54,7 @@ async def create_support_ticket(date_of_the_ticket: date = Form(...),
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error uploading file: {e}")
     support_ticket_data = {
-        "date_inserted": datetime.now(),
+        "date_added": datetime.now(),
         "user_id": user_id,
         "date_of_the_ticket": pd.to_datetime(date_of_the_ticket),
         "support_ticket_subject": support_ticket_subject,
@@ -94,7 +94,7 @@ async def test_post(attachments: List[UploadFile] = File(...)):
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error uploading file: {e}")
     support_ticket_data = {
-        "date_inserted": datetime.now(),
+        "date_added": datetime.now(),
         "attachments": attachment_urls
     }
     print(support_ticket_data)

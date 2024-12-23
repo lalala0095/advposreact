@@ -19,7 +19,7 @@ async def create_cash_flow(cash_flow: CashFlows, token_data: dict = Depends(veri
     user_id = token_data['account_id']
     payload = token_data['payload']
     cash_flow_data = {
-        "date_inserted": datetime.now(),
+        "date_added": datetime.now(),
         "user_id": user_id,
         "date_of_transaction": pd.to_datetime(cash_flow.date_of_transaction),
         "description": cash_flow.description,

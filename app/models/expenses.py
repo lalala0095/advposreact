@@ -6,33 +6,33 @@ from datetime import date
 fields = ['utilities', 'rent', 'loan', 'credit_card', 'investment', 'insurance', 'others']
 BillerType = Enum(
     "BillerType",
-    {field: field.replace('_', '').title() for field in fields}
+    {field: field.replace('_', ' ').title() for field in fields}
 )
 
 fields = ['fix', 'changing']
 AmountType = Enum(
     "AmountType",
-    {field: field.replace('_', '').title() for field in fields}
+    {field: field.replace('_', ' ').title() for field in fields}
 )
 
 class Biller(BaseModel):
     biller_name: str = Field(..., max_length=100, description="Biller Name")
     biller_type: BillerType = Field(..., description="Choose if it the amount changes or not")
     amount_type: AmountType = Field(..., description="Choose if it the amount changes or not")
-    amount: float = Field(0, ge=0, description="Amount (Leave Blank if Amount Type = Changing)")
-    custom_type: Optional[str] = Field(..., max_length=255, description="Custom Type")
-    usual_due_date_day: Optional[int] = Field(1, ge=1, le=31, description="Usual Due Date Day")
-    remarks: Optional[str] = Field(..., max_length=500, description="Remarks")
+    amount: Optional[float] = Field(None, ge=0, description="Amount (Leave Blank if Amount Type = Changing)")
+    custom_type: Optional[str] = Field(None, max_length=255, description="Custom Type")
+    usual_due_date_day: Optional[int] = Field(None, ge=1, le=31, description="Usual Due Date Day")
+    remarks: Optional[str] = Field(None, max_length=500, description="Remarks")
 
 fields = ['need', 'want']
 ExpenseType = Enum(
     "ExpenseType",
-    {field: field.replace('_', '').title() for field in fields}
+    {field: field.replace('_', ' ').title() for field in fields}
 )
 fields = ['Shopee', 'Tiktok', 'Lazada', 'Physical Store', 'Amazon', 'Ali Express', 'Others']
 ExpensePlatform = Enum(
     "ExpensePlatform",
-    {field: field.replace('_', '').title() for field in fields}
+    {field: field.replace('_', ' ').title() for field in fields}
 )
 class Expenses(BaseModel):
     date_of_transaction: date = Field(..., description="The date when the transaction occurred")
@@ -57,7 +57,7 @@ class CashFlows(BaseModel):
 fields = ['urgent', 'normal', 'low']
 BillType = Enum(
     "BillType",
-    {field: field.replace('_', '').title() for field in fields}
+    {field: field.replace('_', ' ').title() for field in fields}
 )
 class Bill(BaseModel):
     biller_object_id: str = Field(..., max_length=100, description="The ObjectId of the specified Biller")

@@ -32,7 +32,7 @@ async def admin_signup(admin: AdminSignupRequest):
     registration_datetime = datetime.now()
     expiration = datetime.now() + timedelta(days=30)
     admin_data = {
-        "date_inserted": registration_datetime,
+        "date_added": registration_datetime,
         "username": admin.username,
         "password": hashed_password,
         "name": admin.name,
@@ -105,13 +105,6 @@ async def protected_route(token_data: dict = Depends(verify_token)):
         return {"message": "Access granted", "account_id": account_id, "account_object": account_object}
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token.")
-
-# @router.get("/protected")
-# async def protected_route(request: Request):
-#     authorization_header = request.headers.get("authorization")
-#     logging.debug(f"Authorization header: {authorization_header}")
-#     return {"message": "Authorization header logged"}
-
 
 @router.post("/logout")
 async def logout(token: str = Depends(verify_token)):
