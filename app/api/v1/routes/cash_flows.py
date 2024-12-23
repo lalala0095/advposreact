@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from app.core.database import db
 from passlib.context import CryptContext
-from app.models.expenses import CashFlows
+from app.models.expenses import CashFlows, CashFlowType
 import pandas as pd
 from bson import ObjectId
 from app.core.auth import verify_token, oauth2_scheme
@@ -10,23 +10,25 @@ from datetime import datetime
 from app.core.custom_logging import create_custom_log
 from typing import List, Dict
 import math
+from app.core.database import redis_client
+import json
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.post("/")
 async def create_cash_flow(cash_flow: CashFlows, token_data: dict = Depends(verify_token)):
+    logging.debug(cash_flow)
     user_id = token_data['account_id']
     payload = token_data['payload']
     cash_flow_data = {
         "date_added": datetime.now(),
         "user_id": user_id,
         "date_of_transaction": pd.to_datetime(cash_flow.date_of_transaction),
-        "description": cash_flow.description,
-        "price": cash_flow.price,
-        "cash_flow_type": cash_flow.cash_flow_type,
+        "cash_flow_name": cash_flow.cash_flow_name,
+        "amount": cash_flow.amount,
+        "cash_flow_type": cash_flow.cash_flow_type.value,
         "platform": cash_flow.platform,
-        "store": cash_flow.store,
         "remarks": cash_flow.remarks,
         "payment_method": cash_flow.payment_method
     }
@@ -127,8 +129,11 @@ async def get_cash_flows(page: int = 1, limit: int = 10, token_data: dict = Depe
 
     # Fetch the paginated data from MongoDB
     cash_flows = await db.cash_flows.find().skip(skip).limit(limit).to_list(length=limit)
+    new_cash_flows = []
     for i in cash_flows:
         i['_id'] = str(i['_id'])
+        i['date_added'] = i['date_added'].strftime('%b %d, %Y')
+        new_cash_flows.append(i)
 
     total_count = await db.cash_flows.count_documents({})
     total_pages = math.ceil(total_count / limit)
@@ -154,7 +159,59 @@ async def get_cash_flows(page: int = 1, limit: int = 10, token_data: dict = Depe
             "page": page,
             "total_pages": total_pages,
             "total_items": total_count,
-            "items": cash_flows
+            "items": new_cash_flows
         }
     }
+    
+
+@router.get("/get_cash_flow/{cash_flow_id}", response_model=Dict[str, Dict[str, object]])
+async def get_cash_flow(cash_flow_id: str, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
+
+    cash_flow = await db.cash_flows.find_one({"_id": ObjectId(cash_flow_id)})
+    cash_flow["_id"] = str(cash_flow['_id'])
+    cash_flow['date_added'] = cash_flow['date_added'].strftime('%Y-%m-%d')
+    # Check if no cash_flows were found
+    if not cash_flow:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No cash_flow found"
+        )
+    
+    await create_custom_log(
+        event= "get one cash_flow",
+        user_id = user_id,
+        account_id = user_id,
+        objectid=None,
+        page_number= None,
+        new_doc = None,
+        error= None
+    )
+    
+    return {
+        "response": {
+            "item": cash_flow
+        }
+    }
+    
+@router.get("/get_options", response_model=Dict[str, Dict[str, object]])
+async def get_options(token_data: dict = Depends(verify_token)):
+    cached_options = await redis_client.get('cash_flows_options')
+    
+    if cached_options:
+        # Return from cache if available
+        return json.loads(cached_options)
+
+    # If not in cache, generate options
+    options = {
+        "response": {
+            "cash_flow_types": [cash_flow_type.value for cash_flow_type in CashFlowType]
+        }
+    }
+    
+    # Cache the options for future use (no expiration)
+    redis_client.set('cash_flows_options', json.dumps(options), ex=0)  # Set expiration to 0 (no expiration)
+    
+    return options
     

@@ -155,16 +155,15 @@ async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends
     skip = (page - 1) * limit
 
     # Fetch the paginated data from MongoDB
-    billers = await db.billers.find().skip(skip).limit(limit).to_list(length=limit)  
+    billers = await db.billers.find().sort({'date_added': -1}).skip(skip).limit(limit).to_list(length=limit)  
     if not billers:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No billers found"
         )  
-    
-    billers_sorted = sorted(billers, key=lambda x: x['date_added'], reverse=True)
+    logging.debug(billers)
 
-    for i in billers_sorted:
+    for i in billers:
         i['_id'] = str(i['_id'])
         i['date_added'] = i['date_added'].strftime("%b %d, %Y")
         
@@ -187,7 +186,7 @@ async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends
             "page": page,
             "total_pages": total_pages,
             "total_items": total_count,
-            "items": billers_sorted
+            "items": billers
         }
     }
     

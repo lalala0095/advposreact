@@ -37,20 +37,24 @@ ExpensePlatform = Enum(
 class Expenses(BaseModel):
     date_of_transaction: date = Field(..., description="The date when the transaction occurred")
     description: str = Field(..., max_length=255, description="Description of the expense")
-    price: float = Field(..., ge=0, description="Price of the expense")
+    amount: float = Field(..., ge=0, description="Amount of the expense")
     expense_type: ExpenseType = Field(..., description="Type/category of the expense")
     platform: ExpensePlatform = Field(..., description="Platform where the expense was made")
     store: str = Field(..., max_length=255, description="Store or vendor name")
     remarks: str = Field(None, max_length=1000, description="Additional remarks or notes")
     payment_method: str = Field(..., max_length=100, description="Payment method used for the expense")
 
+fields = ['salary', 'business_income', 'bank_balance', 'cash_balance', 'commission', 'projection', 'others']
+CashFlowType = Enum(
+    "CashFlowType",
+    {field: field.replace('_', ' ').title() for field in fields}
+)
 class CashFlows(BaseModel):
     date_of_transaction: date = Field(..., description="The date when the transaction occurred")
-    description: str = Field(..., max_length=255, description="Description of the cash flow")
-    price: float = Field(..., ge=0, description="Price of the cash flow")
-    expense_type: str = Field(..., max_length=100, description="Type/category of the cash flow")
+    cash_flow_name: str = Field(..., max_length=255, description="Description of the cash flow")
+    amount: float = Field(..., ge=0, description="Amount of the cash flow")
+    cash_flow_type: CashFlowType = Field(..., description="Type/category of the cash flow")
     platform: str = Field(..., max_length=100, description="Platform where the cash flow was made")
-    store: str = Field(..., max_length=255, description="Store or vendor name")
     remarks: str = Field(None, max_length=1000, description="Additional remarks or notes")
     payment_method: str = Field(..., max_length=100, description="Payment method used for the cash flow")
 

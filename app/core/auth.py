@@ -62,8 +62,15 @@ async def get_token_from_redis(account_id: str):
     """
     try:
         account_object = await redis_client.get(account_id)
+        logger.debug(account_object)
         account_object_dict = json.loads(account_object)
         return account_object_dict
+    except TypeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": "Failed to process event, please contact us developers.",
+            "others_details": str(e)}
+        )
     except redis.RedisError as e:
         logger.error("Failed to retrieve token from Redis: %s", e)
         raise HTTPException(
@@ -88,33 +95,29 @@ async def verify_token(token: str = Depends(oauth2_scheme)):
                 detail="Invalid token payload"
             )
         stored_token_dict = await get_token_from_redis(account_id)
-        stored_token = stored_token_dict['token']
-        # stored_token_dict = json.loads(stored_token) 
-        # logging.debug(f"Received token: {stored_token_dict['token']}")
-        if not stored_token:
+        try:
+            stored_token = stored_token_dict['token']
+            if not stored_token:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token not found in Redis"
+                )
+
+            # Compare the token from the request with the one stored in Redis
+            if stored_token != token:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token mismatch or invalid"
+                )
+            
+            # logging.debug(f"User ID from token: {account_id}: {stored_token}")
+            return {"account_id": account_id, "payload": payload, "account_object": stored_token_dict}
+
+        except TypeError as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token not found in Redis"
+                detail="Invalid or expired token."
             )
-
-        # Decode the stored token (as it may be returned in bytes format)
-        # stored_token = stored_token.decode('utf-8')
-
-        # If stored_token is bytes, decode it to string
-        # if isinstance(stored_token, bytes):
-        #     stored_token = stored_token.decode('utf-8')
-        
-        # logging.debug(f"Stored token in Redis for account {account_id}: {stored_token}")
-
-        # Compare the token from the request with the one stored in Redis
-        if stored_token != token:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token mismatch or invalid"
-            )
-        
-        # logging.debug(f"User ID from token: {account_id}: {stored_token}")
-        return {"account_id": account_id, "payload": payload, "account_object": stored_token_dict}
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(
