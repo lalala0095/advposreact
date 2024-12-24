@@ -1,8 +1,7 @@
-// src/hooks/useBillers.js
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiService from '../services/apiService'; // Centralized API service
 
-const useBillers = (currentPage = 1) => {
+const useBillers = (currentPage = 1, refreshKey) => {
   const [billers, setBillers] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -10,29 +9,22 @@ const useBillers = (currentPage = 1) => {
 
   useEffect(() => {
     const fetchBillers = async () => {
+      setLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/billers`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            page: currentPage,
-          },
-        });
-
-        setBillers(response.data.response.items);
-        setTotalPages(response.data.response.total_pages);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching billers data:', error);
-        setError(error);
+        const response = await apiService.getBillers(currentPage);
+        const { items, total_pages } = response.data;
+        setBillers(items);
+        setTotalPages(total_pages);
+        setError(null);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || 'Error fetching billers');
+      } finally {
         setLoading(false);
       }
     };
-
     fetchBillers();
-  }, [currentPage]);
+  }, [currentPage, refreshKey]);
 
   return { billers, totalPages, loading, error };
 };

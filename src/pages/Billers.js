@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import BillersTable from '../components/BillersTable';
 import FlashMessage from '../components/FlashMessage'; // Import the new FlashMessage component
 import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton } from '../styles/BillersStyles'
-import { AmountTypeDropdown, BillerTypeDropdown } from '../components/BillersDropdowns';
+import { AmountTypeDropdown, BillerTypeDropdown } from '../components/Dropdowns';
 
 const BillersPage = ({ sidebarOpen }) => {
+  const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
   const [flashMessage, setFlashMessage] = useState('');
   const [showForm, setShowForm] = useState(false); // State to toggle the form visibility
@@ -20,9 +21,18 @@ const BillersPage = ({ sidebarOpen }) => {
     remarks: '',
   });
 
+  const refreshData = () => {
+    setRefreshKey(prevKey => prevKey + 1);
+  };
+  
+
   const handleFlashMessage = (message) => {
     setFlashMessage(message);
+    setTimeout(() => {
+      setFlashMessage(''); // Clear the message after a delay
+    }, 3000);
   };
+  
 
   const handleAddBiller = async (e) => {
     e.preventDefault();
@@ -54,12 +64,20 @@ const BillersPage = ({ sidebarOpen }) => {
       const result = await response.json();
   
       if (response.ok) {
-        // Success - Handle the response from FastAPI
-        handleFlashMessage(result.data.message + " Redirecting. . .");
+        // Trigger success message
+        handleFlashMessage(result.message);
+        refreshData();
+        setTimeout(() => navigate("/billers"), 2000);
+        // Trigger BillersTable refresh
+        const table = document.querySelector('.billers-table'); // Assuming a class name
+        if (table) {
+          table.refreshData(); // Custom method for fetching updated data
+        }
+      
+        // Navigate or update state
         setTimeout(() => {
           navigate("/billers");
         }, 2000);
-  
       } else {
         // Error - Handle error response from FastAPI
         const errorDetail = result.response?.detail || 'Something went wrong';
@@ -100,7 +118,7 @@ const BillersPage = ({ sidebarOpen }) => {
           </AddButton>
         </Header>
         {flashMessage && <FlashMessage message={flashMessage} />} {/* Use the FlashMessage component here */}
-        <BillersTable handleFlashMessage={handleFlashMessage} />
+        <BillersTable handleFlashMessage={handleFlashMessage} refreshKey={refreshKey} />
         {showForm && (
           <FormWrapper onSubmit={handleAddBiller}>
             <h3>Add New Biller*</h3>

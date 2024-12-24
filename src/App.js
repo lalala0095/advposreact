@@ -10,12 +10,14 @@ import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
 import Login from './pages/Login';
-import AuthProvider from './components/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
 import Billers from './pages/Billers';
 import EditBillerPage from './pages/EditBiller';
 import CashFlows from './pages/CashFlows';
 import EditCashFlow from './pages/EditCashFlow';
+import Settings from './pages/Settings';
+
+import AuthProvider from './components/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -43,6 +45,14 @@ const App = () => {
                     }
                   />
                   <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
                     path="/dashboard"
                     element={
                       <ProtectedRoute>
@@ -59,7 +69,7 @@ const App = () => {
                       </ProtectedRoute>
                     }
                   />
-                  <Route path="/edit-biller/:billerId" element={<EditBillerPage />} />
+                  <Route path="/edit-cash_flow/:cash_flowId" element={<EditCashFlow />} />
                   <Route
                     path="/cash_flows"
                     element={
@@ -68,7 +78,6 @@ const App = () => {
                       </ProtectedRoute>
                     }
                   />
-                  <Route path="/edit-cash-flow/:cashFlowId" element={<EditCashFlow />} />
                   <Route
                     path="/reports"
                     element={

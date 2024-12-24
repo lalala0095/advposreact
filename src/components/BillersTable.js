@@ -1,43 +1,40 @@
-// src/components/BillersTable.js
 import React from 'react';
 import { FaTrashAlt, FaPenSquare } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import useBillers from '../hooks/useBillers';  // Import the custom hook
-import { TableWrapper, Table, TableHeader, TableRow, TableData, EditButton, DeleteButton } from '../styles/BillersStyles';
+import useBillers from '../hooks/useBillers';
+import {
+  TableWrapper,
+  Table,
+  TableHeader,
+  TableRow,
+  TableData,
+  EditButton,
+  DeleteButton,
+} from '../styles/BillersStyles';
 import PaginationControl from './PaginationControl';
-import axios from 'axios';
+import apiService from '../services/apiService'; // Centralized API service
 
-const BillersTable = ({ handleFlashMessage }) => {
+const BillersTable = ({ refreshKey, handleFlashMessage }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const navigate = useNavigate();
-  
-  const { billers, totalPages, loading, error } = useBillers(currentPage); // Use the hook
+  const { billers, totalPages, loading, error } = useBillers(currentPage, refreshKey);
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+  const handlePageChange = (newPage) => setCurrentPage(newPage);
 
   const handleDelete = async (billerId) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${process.env.REACT_APP_FASTAPI_URL}/billers/${billerId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      handleFlashMessage('Biller deleted successfully');
+      await apiService.deleteBiller(billerId);
+      handleFlashMessage('Biller deleted successfully.');
     } catch (error) {
-      console.error('Error deleting biller:', error);
+      console.error(error);
+      handleFlashMessage('Failed to delete biller.');
     }
   };
 
-  const handleEdit = (billerId) => {
-    navigate(`/edit-biller/${billerId}`);
-  };
+  const handleEdit = (billerId) => navigate(`/edit-biller/${billerId}`);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading billers data</div>;
+  if (error) return <div>Error loading billers.</div>;
 
   return (
     <TableWrapper>

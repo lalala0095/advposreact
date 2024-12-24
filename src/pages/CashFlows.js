@@ -1,16 +1,16 @@
 // pages/CashFlowsPage.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CashFlowsTable from '../components/CashFlowsTable';
 import FlashMessage from '../components/FlashMessage'; // Import the new FlashMessage component
-import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, Label, InputField, TextArea, DateInputField } from '../styles/BillersStyles'
-import { CashFlowTypeDropdown } from '../components/CashFlowsDropdowns';
-import useCashFlows from '../hooks/useCashFlows';
-import { useNavigate } from 'react-router-dom';
+import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, InputField, Label, TextArea, DateInputField } from '../styles/BillersStyles'
+import { CashFlowTypeDropdown } from '../components/Dropdowns';
 
 const CashFlowsPage = ({ sidebarOpen }) => {
+  const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
   const [flashMessage, setFlashMessage] = useState('');
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(false); // State to toggle the form visibility
   const [formData, setFormData] = useState({
     date_of_transaction: '',
     cash_flow_name: '',
@@ -22,11 +22,18 @@ const CashFlowsPage = ({ sidebarOpen }) => {
     remarks: '',
   });
 
-  const { cash_flows, totalPages, loading, error, refreshData } = useCashFlows(1);
+  const refreshData = () => {
+    setRefreshKey(prevKey => prevKey + 1);
+  };
+  
 
   const handleFlashMessage = (message) => {
     setFlashMessage(message);
+    setTimeout(() => {
+      setFlashMessage(''); // Clear the message after a delay
+    }, 3000);
   };
+  
 
   const handleAddCashFlow = async (e) => {
     e.preventDefault();
@@ -43,10 +50,6 @@ const CashFlowsPage = ({ sidebarOpen }) => {
       remarks: formData.remarks,
     };
   
-    if (formData.usual_due_date_day === '') {
-      delete cash_flowData.usual_due_date_day;
-    }
-  
     try {
       // Make the POST request to add the new cash_flow
       const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows`, {
@@ -60,44 +63,30 @@ const CashFlowsPage = ({ sidebarOpen }) => {
       const result = await response.json();
   
       if (response.ok) {
-        // Success - Handle the response from FastAPI
-        handleFlashMessage(result.message + ". Please wait for the data refresh.");
-        setFormData({
-          date_of_transaction: '',
-          cash_flow_name: '',
-          cash_flow_type: '',
-          custom_type: '',
-          amount: '',
-          platform: '',
-          payment_method: '',
-          remarks: '',
-        });
-        setShowForm(false);
+        // Trigger success message
+        handleFlashMessage(result.message);
+        refreshData();
+        setTimeout(() => navigate("/cash_flows"), 2000);
+        // Trigger CashFlowsTable refresh
+        const table = document.querySelector('.cash_flows-table'); // Assuming a class name
+        if (table) {
+          table.refreshData(); // Custom method for fetching updated data
+        }
+      
+        // Navigate or update state
         setTimeout(() => {
-          console.log("refreshing data");
-          refreshData();
-          // <ForceRerender />
-          console.log("navigating");
           navigate("/cash_flows");
-          // window.location.href = "/cash_flows"; 
-        }, 1000);
-        // navigate("/cash_flows");
+        }, 2000);
       } else {
         // Error - Handle error response from FastAPI
-        const errorDetail = result?.detail || 'Something went wrong';
-        
-        // If FastAPI returns a list of validation errors, display them
-        if (Array.isArray(errorDetail)) {
-          const errorMessages = errorDetail.map((err) => `${err.loc.join('.')} - ${err.msg}`).join(', ');
-          handleFlashMessage(`Validation Errors: ${errorMessages}`);
-        } else {
-          handleFlashMessage(`Error: ${errorDetail}`);
-        }
+        const errorDetail = result.response?.detail || 'Something went wrong';
+        console.error('Error:', errorDetail);
+        handleFlashMessage(`Error: ${errorDetail}`);
       }
     } catch (error) {
       // Handle any other errors (e.g., network issues)
       console.error('Error adding cash_flow:', error);
-      handleFlashMessage('An unexpected error occurred while adding the cash flow.');
+      handleFlashMessage('An error occurred while adding the cash_flow.');
     }
   
     // Clear the form data after submission
@@ -114,7 +103,6 @@ const CashFlowsPage = ({ sidebarOpen }) => {
     });
     setShowForm(false); // Hide the form after submission
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -125,21 +113,18 @@ const CashFlowsPage = ({ sidebarOpen }) => {
     <PageContainer>
       <ContentContainer sidebarOpen={sidebarOpen}>
         <Header>
-          <h1>Manage Cash Flows</h1>
+          <h1>Manage CashFlows</h1>
           <AddButton onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancel' : 'Add New Cash Flow'}
+            {showForm ? 'Cancel' : 'Add New CashFlow'}
           </AddButton>
         </Header>
-        {flashMessage && <FlashMessage message={flashMessage} />}
-        {loading && <p>Loading...</p>}
-        {error && <p>Error: {error.message}</p>}
-        <CashFlowsTable cashFlows={cash_flows} totalPages={totalPages} handleFlashMessage={handleFlashMessage} />
+        {flashMessage && <FlashMessage message={flashMessage} />} {/* Use the FlashMessage component here */}
+        <CashFlowsTable handleFlashMessage={handleFlashMessage} refreshKey={refreshKey} />
         {showForm && (
-        <FormWrapper>
-          <h2 className="text-center mb-4">Add Cash Flow</h2>
-          <form onSubmit={handleAddCashFlow}>
+          <FormWrapper onSubmit={handleAddCashFlow}>
+            <h3>Add New CashFlow*</h3>
             <FormRow>
-              <Label htmlFor="date_of_transaction">Cash Flow Type</Label>
+              <Label htmlFor="date_of_transaction">Date of Transaction</Label>
               <DateInputField
                 name='date_of_transaction'
                 value={formData.date_of_transaction}
@@ -202,9 +187,8 @@ const CashFlowsPage = ({ sidebarOpen }) => {
                 onChange={handleChange}
               />
             </FormRow>
-            <SubmitButton type="submit" onClick={handleAddCashFlow}>Save Changes</SubmitButton>
-          </form>
-        </FormWrapper>
+            <SubmitButton type="submit">Save</SubmitButton>
+          </FormWrapper>
         )}
       </ContentContainer>
     </PageContainer>

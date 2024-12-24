@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FormWrapper, FormRow, Label, InputField, TextArea, SubmitButton, PageContainer, ContentContainer } from "../styles/BillersStyles";
-import { AmountTypeDropdown, BillerTypeDropdown } from "../components/BillersDropdowns";
+import { AmountTypeDropdown, BillerTypeDropdown } from "../components/Dropdowns";
 import FlashMessage from "../components/FlashMessage";
 import useBillers from "../hooks/useBillers";
 

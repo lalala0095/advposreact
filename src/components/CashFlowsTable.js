@@ -1,50 +1,54 @@
-// src/components/CashFlowsTable.js
 import React from 'react';
 import { FaTrashAlt, FaPenSquare } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import useCashFlows from '../hooks/useCashFlows';  // Import the custom hook
-import { TableWrapper, Table, TableHeader, TableRow, TableData, EditButton, DeleteButton } from '../styles/BillersStyles';
+import useCashFlows from '../hooks/useCashFlows';
+import {
+  TableWrapper,
+  Table,
+  TableHeader,
+  TableRow,
+  TableData,
+  EditButton,
+  DeleteButton,
+} from '../styles/BillersStyles';
 import PaginationControl from './PaginationControl';
-import axios from 'axios';
+import apiService from '../services/apiService'; // Centralized API service
 
-const CashFlowsTable = ({ handleFlashMessage }) => {
+const CashFlowsTable = ({ refreshKey, handleFlashMessage }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const navigate = useNavigate();
-  
-  const { cash_flows, totalPages, loading, error, refreshData } = useCashFlows(currentPage); 
+  const { cash_flows, totalPages, loading, error } = useCashFlows(currentPage, refreshKey);
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
-  
-  const handleDelete = async (cashFlowId) => {
+  const handlePageChange = (newPage) => setCurrentPage(newPage);
+
+  const handleDelete = async (cash_flowId) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/${cashFlowId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      handleFlashMessage('CashFlow deleted successfully');
-      refreshData(); // Refresh the data after deletion
+      await apiService.deleteCashFlow(cash_flowId);
+      handleFlashMessage('CashFlow deleted successfully.');
     } catch (error) {
-      console.error('Error deleting cash_flow:', error);
-      handleFlashMessage('Failed to delete cash flow. Please try again.');
+      console.error(error);
+      handleFlashMessage('Failed to delete cash_flow.');
     }
   };
 
-  const handleEdit = (cashFlowId) => {
-    navigate(`/edit-cash-flow/${cashFlowId}`);
+  const handleEdit = async (cash_flowId) => {
+    console.log("editing for " + cash_flowId);
+    try {
+      // await apiService.getCashFlow(cash_flowId);
+      navigate(`/edit-cash_flow/${cash_flowId}`);  
+    } catch (error) {
+      console.error(error);
+      handleFlashMessage('Failed to edit cash_flow.');
+    }
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading cash_flows data</div>;
+  if (error) return <div>Error loading cash_flows.</div>;
 
   return (
     <TableWrapper>
       <h2>Cash Flows List</h2>
-      <Table key={currentPage}>
+      <Table>
         <thead>
           <tr>
             <TableHeader>Date Added</TableHeader>
