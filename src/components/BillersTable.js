@@ -19,15 +19,27 @@ const BillersTable = ({ refreshKey, handleFlashMessage }) => {
   const navigate = useNavigate();
   const { billers, totalPages, loading, error } = useBillers(currentPage, refreshKey);
 
+  const forceUpdate = () => {
+    setCurrentPage(1)
+  };
+
   const handlePageChange = (newPage) => setCurrentPage(newPage);
 
   const handleDelete = async (billerId) => {
+    const response = await apiService.deleteBiller(billerId);
     try {
-      await apiService.deleteBiller(billerId);
-      handleFlashMessage('Biller deleted successfully.');
+      setTimeout(() => {
+        forceUpdate();
+        handleFlashMessage(response.data.message + " Refreshing the page.");
+        navigate('/cash_flows');
+      }, 1000);
     } catch (error) {
-      console.error(error);
-      handleFlashMessage('Failed to delete biller.');
+      setTimeout(() => {
+        forceUpdate();
+        console.error(error);
+        handleFlashMessage(response.detail + " Refreshing the page.");
+        // navigate('/cash_flows');  
+      }, 1000);
     }
   };
 

@@ -25,3 +25,5 @@ yarn-error.log*
 # my custom files
 venv
 .env
+src/pages/*Legacy*
+src/pages/*Copy*

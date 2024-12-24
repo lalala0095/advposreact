@@ -76,7 +76,7 @@ const EditBillerPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      handleFlashMessage(result.data.response.message + " Redirecting. . .");
+      handleFlashMessage(result.data.data.message + " Redirecting. . .");
       setTimeout(() => {
         navigate("/billers");
       }, 2000);
