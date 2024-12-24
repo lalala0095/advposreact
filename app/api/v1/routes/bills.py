@@ -178,7 +178,7 @@ async def get_bills(page: int = 1, limit: int = 10, token_data: dict = Depends(v
     )
         
     return {
-        "response": {
+        "data": {
             "limit": limit,
             "page": page,
             "total_pages": total_pages,

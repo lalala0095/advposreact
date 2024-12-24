@@ -154,7 +154,7 @@ async def get_cash_flows(page: int = 1, limit: int = 10, token_data: dict = Depe
     )
         
     return {
-        "response": {
+        "data": {
             "limit": limit,
             "page": page,
             "total_pages": total_pages,
@@ -172,6 +172,7 @@ async def get_cash_flow(cash_flow_id: str, token_data: dict = Depends(verify_tok
     cash_flow = await db.cash_flows.find_one({"_id": ObjectId(cash_flow_id)})
     cash_flow["_id"] = str(cash_flow['_id'])
     cash_flow['date_added'] = cash_flow['date_added'].strftime('%Y-%m-%d')
+    cash_flow['date_of_transaction'] = cash_flow['date_of_transaction'].strftime('%Y-%m-%d')
     # Check if no cash_flows were found
     if not cash_flow:
         raise HTTPException(
@@ -190,7 +191,7 @@ async def get_cash_flow(cash_flow_id: str, token_data: dict = Depends(verify_tok
     )
     
     return {
-        "response": {
+        "data": {
             "item": cash_flow
         }
     }
@@ -205,7 +206,7 @@ async def get_options(token_data: dict = Depends(verify_token)):
 
     # If not in cache, generate options
     options = {
-        "response": {
+        "data": {
             "cash_flow_types": [cash_flow_type.value for cash_flow_type in CashFlowType]
         }
     }

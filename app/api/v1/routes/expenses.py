@@ -158,7 +158,7 @@ async def get_expenses(page: int = 1, limit: int = 10, token_data: dict = Depend
     )
         
     return {
-        "response": {
+        "data": {
             "limit": limit,
             "page": page,
             "total_pages": total_pages,

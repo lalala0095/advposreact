@@ -45,9 +45,7 @@ async def create_biller(biller: Biller, token_data: dict = Depends(verify_token)
     )
 
     return { 
-        "response": {
             "message": "Biller created successfully", "object_id": object_id
-        }
     }
 
 
@@ -99,7 +97,7 @@ async def update_biller(biller_id: str, updated_biller: Biller, token_data: dict
             detail="Biller not found"
         )
 
-    return { "response": {
+    return { "data": {
         "message": "Biller updated successfully."}
     } 
 
@@ -181,7 +179,7 @@ async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends
     )
     
     return {
-        "response": {
+        "data": {
             "limit": limit,
             "page": page,
             "total_pages": total_pages,
@@ -216,7 +214,7 @@ async def get_biller(biller_id: str, token_data: dict = Depends(verify_token)):
     )
     
     return {
-        "response": {
+        "data": {
             "item": biller
         }
     }
@@ -231,7 +229,7 @@ async def get_options(token_data: dict = Depends(verify_token)):
 
     # If not in cache, generate options
     options = {
-        "response": {
+        "data": {
             "biller_types": [biller_type.value for biller_type in BillerType],
             "amount_types": [amount_type.value for amount_type in AmountType]
         }
