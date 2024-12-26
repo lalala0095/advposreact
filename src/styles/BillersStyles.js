@@ -199,3 +199,33 @@ export const DropdownWrapper = styled.div`
     box-shadow: 0 0 0 0.25rem rgba(38, 143, 255, 0.25);
   }
 `;
+
+export const SignupDropdownWrapper = styled.div`
+  select {
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #444; /* Dark border */
+    border-radius: 5px;
+    width: 100%;
+    background-color: #2e2e2e; /* Dark input background */
+    color: #e0e0e0; /* Light text inside the dropdown */
+    max-width: 380px;
+    transition: border-color 0.3s ease;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: #4caf50; /* Green border on focus */
+  }
+
+  option {
+    background-color: #2e2e2e; /* Dark background for options */
+    color: #e0e0e0; /* Light text for options */
+  }
+
+  select:hover {
+    border-color: #45a049; /* Darker green border on hover */
+  }
+`;
+

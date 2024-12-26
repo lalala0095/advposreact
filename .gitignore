@@ -27,3 +27,4 @@ venv
 .env
 src/pages/*Legacy*
 src/pages/*Copy*
+src/*Legacy*

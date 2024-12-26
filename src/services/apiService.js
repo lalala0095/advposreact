@@ -5,6 +5,13 @@ const getToken = () => {
 };
 
 const apiService = {
+  getSubscriptionOptions: async () => {
+    const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/accounts/get_options`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response.data.options;
+  },
+
   getCashFlowTypeOptions: async () => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/get_options`, {
       headers: { Authorization: `Bearer ${getToken()}` },
@@ -113,6 +120,21 @@ const apiService = {
       return response.data.message;
    } catch (err) {
       console.error("Logout failed:", err);
+      throw new Error("Invalid credentials");
+    }
+  },
+
+  signup: async (userData) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_FASTAPI_URL}/accounts/signup`, 
+        userData,
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      );
+      return response;
+   } catch (err) {
+      console.error("Signup failed:", err);
       throw new Error("Invalid credentials");
     }
   },

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { DropdownWrapper } from "../styles/BillersStyles";
+import { DropdownWrapper, SignupDropdownWrapper } from "../styles/BillersStyles";
 import apiService from "../services/apiService";
 
 export const AmountTypeDropdown = ({ value, onChange }) => {
@@ -134,5 +134,49 @@ export const CashFlowTypeDropdown = ({ value, onChange }) => {
         )}
       </select>
     </DropdownWrapper>
+  );
+};
+
+export const SubscriptionDropdown = ({ value, onChange }) => {
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSubscriptionTypes = async () => {
+      try {
+        const response = await apiService.getSubscriptionOptions();
+        console.log('Subscription Types Response:', response);
+        setOptions(response || []);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching subscription types:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptionTypes();
+  }, []);
+
+  if (loading) return <div>Loading Subscription Types...</div>;
+
+  return (
+    <SignupDropdownWrapper>
+      <select
+        name="subscription"
+        value={value || ""}
+        onChange={onChange}
+      >
+        <option value="">Select Subscription Type</option>
+        {options && options.length > 0 ? (
+          options.map((option) => (
+            <option key={option} value={option}>
+              {option.charAt(0).toUpperCase() + option.slice(1)}
+            </option>
+          ))
+        ) : (
+          <option>No options available</option>
+        )}
+      </select>
+    </SignupDropdownWrapper>
   );
 };

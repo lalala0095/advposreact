@@ -15,6 +15,7 @@ import EditBillerPage from './pages/EditBiller';
 import CashFlows from './pages/CashFlows';
 import EditCashFlow from './pages/EditCashFlow';
 import Settings from './pages/Settings';
+import Signup from './pages/Signup';
 
 import AuthProvider from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -28,35 +29,21 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <Router>
-            <AppWrapper>
-              <Sidebar onSidebarToggle={handleSidebarToggle} />
+      <Router>
+        <AuthProvider>
+          <AppWrapper>
+            <Sidebar onSidebarToggle={handleSidebarToggle} />
               <ContentWrapper isSidebarOpen={isSidebarOpen}>
                 <Header />
                 <Routes>
                   <Route path="/login" element={<Login />} />
-                  <Route
-                    path="/"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
+                  <Route path="/signup" element={ <Signup /> } />
+                  <Route path="/" element={ <Dashboard /> } />
                   <Route
                     path="/settings"
                     element={
                       <ProtectedRoute>
                         <Settings />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
                       </ProtectedRoute>
                     }
                   />
@@ -89,8 +76,8 @@ const App = () => {
                 </Routes>
               </ContentWrapper>
             </AppWrapper>
+          </AuthProvider>
         </Router>
-      </AuthProvider>
     </ThemeProvider>
   );
 };

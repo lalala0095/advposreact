@@ -1,0 +1,96 @@
+/* Signup.css */
+
+body {
+  background-color: #252424; /* Dark background for the whole page */
+  color: #e0e0e0; /* Light text for dark mode */
+  font-family: 'Arial', sans-serif;
+}
+
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #121212; /* Dark background */
+}
+
+.signup-box {
+  background: #1e1e1e; /* Dark background for the signup box */
+  padding: 30px 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.signup-title {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #e0e0e0; /* Light text color */
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.signup-input {
+  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #444; /* Dark border */
+  border-radius: 5px;
+  width: 100%;
+  background-color: #2e2e2e; /* Dark input background */
+  color: #e0e0e0; /* Light text inside the input */
+  max-width: 380px;
+}
+
+.signup-input:focus {
+  outline: none;
+  border-color: #4caf50; /* Green border on focus */
+}
+
+.signup-button {
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #4caf50; /* Green button */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.signup-button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+/* Dropdown Styles for Signup */
+.signup-dropdown {
+  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #444; /* Dark border */
+  border-radius: 5px;
+  width: 100%;
+  background-color: #2e2e2e; /* Dark input background */
+  color: #e0e0e0; /* Light text inside the dropdown */
+  max-width: 380px;
+}
+
+.signup-dropdown:focus {
+  outline: none;
+  border-color: #4caf50; /* Green border on focus */
+}
+
+.signup-dropdown option {
+  background-color: #2e2e2e; /* Dark background for options */
+  color: #e0e0e0; /* Light text for options */
+}
+
+/* Optional: add a hover effect for the dropdown */
+.signup-dropdown:hover {
+  border-color: #45a049; /* Darker green border on hover */
+}

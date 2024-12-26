@@ -63,15 +63,15 @@ const Sidebar = ({ onSidebarToggle }) => {
   const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login'); // Redirect to login if not authenticated
-    }
-  }, [isAuthenticated, navigate]);
+  // useEffect(() => {
+  //   if (!isAuthenticated) {
+  //     navigate('/'); // Redirect to login if not authenticated
+  //   }
+  // }, [isAuthenticated, navigate]);
 
   const handleLogout = () => {
     logout(); // Call the logout function from context to clear session data
-    navigate('/login'); // Redirect to login page after logout
+    navigate('/'); // Redirect to login page after logout
   };
 
   const handleSidebarToggle = () => {
