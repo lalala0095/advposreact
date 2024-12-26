@@ -17,7 +17,7 @@ router = APIRouter()
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # tokenUrl points to the /login endpoint
 expiration_duration = 3600
-# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def admin_signup(admin: AdminSignupRequest):
@@ -107,11 +107,14 @@ async def protected_route(token_data: dict = Depends(verify_token)):
         raise HTTPException(status_code=401, detail="Invalid token.")
 
 @router.post("/logout")
-async def logout(token: str = Depends(verify_token)):
+async def logout(token_data: str = Depends(verify_token)):
+    account_id = token_data['account_id']
+    payload = token_data['payload']
+    account_object = token_data['account_object']
+    access_token = account_object['token']
     try:
         # Decode the token to find the user ID
-        payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
-        account_id = payload.get("sub")
+        payload = jwt.decode(access_token, settings.secret_key, algorithms=[ALGORITHM])
         if not account_id:
             raise HTTPException(status_code=401, detail="Invalid token.")
 

@@ -159,7 +159,7 @@ async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No billers found"
         )  
-    logging.debug(billers)
+    # logging.debug(billers)
 
     for i in billers:
         i['_id'] = str(i['_id'])
