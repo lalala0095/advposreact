@@ -126,3 +126,14 @@ async def logout(token_data: str = Depends(verify_token)):
         raise HTTPException(status_code=401, detail="Invalid token.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error revoking token: {str(e)}")
+
+@router.get("/get_options")
+async def get_options():
+    try:
+        return {"options": [
+            "Free", "Basic", "Premium"
+        ]}
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error revoking token: {str(e)}")

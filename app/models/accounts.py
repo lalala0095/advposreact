@@ -7,7 +7,7 @@ class AdminSignupRequest(BaseModel):
     confirm_password: str = Field(..., min_length=6)
     name: str = Field(..., max_length=100)
     email: EmailStr
-    subscription: Literal["free", "basic", "premium"]
+    subscription: Literal["Free", "Basic", "Premium"]
 
     class Config:
         schema_extra = {
