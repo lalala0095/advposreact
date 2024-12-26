@@ -1,26 +1,27 @@
 import axios from 'axios';
 
-const token = localStorage.getItem('token');
+const getToken = () => {
+  return localStorage.getItem('token') || '';
+};
 
 const apiService = {
-
   getCashFlowTypeOptions: async () => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/get_options`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getToken()}` },
     });
     return response.data.data.cash_flow_types;
   },
 
   getBillerTypeOptions: async () => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/billers/get_options`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getToken()}` },
     });
     return response.data.data.biller_types;
   },
 
   getAmountTypeOptions: async () => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/billers/get_options`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getToken()}` },
     });
     console.log("result coming from apiService: "+ response.data.data.amount_types)
     return response.data.data.amount_types;
@@ -28,7 +29,7 @@ const apiService = {
 
   getBillers: async (page) => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/billers`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getToken()}` },
       params: { page },
     });
     return response.data;
@@ -36,13 +37,13 @@ const apiService = {
 
   deleteBiller: async (id) => {
     return axios.delete(`${process.env.REACT_APP_FASTAPI_URL}/billers/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getToken()}` },
     });
   },
 
   getCashFlows: async (page) => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getToken()}` },
       params: { page },
     });
     return response.data;
@@ -51,7 +52,7 @@ const apiService = {
   getCashFlow: async (objectId) => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/get_cash_flow/${objectId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
       console.log("received data");
       console.log(response.data.item);
@@ -65,7 +66,7 @@ const apiService = {
   updateCashFlow: async (objectId) => {
     try {
       const response = await axios.put(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/${objectId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
       return response.data.item; // Return the data you need from the response
     } catch (error) {
@@ -76,9 +77,46 @@ const apiService = {
 
   deleteCashFlow: async (id) => {
     return axios.delete(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getToken()}` },
     });
   },
+
+  login: async (username, password) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_FASTAPI_URL}/accounts/login`, {
+        username,
+        password,
+      });
+      const { access_token, account_id } = response.data;
+
+      // Store token and account_id in localStorage
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('account_id', account_id);
+
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+
+      return { access_token, account_id };
+    } catch (err) {
+      console.error("Login failed:", err);
+      throw new Error("Invalid login credentials");
+    }
+  },
+
+  logout: async () => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_FASTAPI_URL}/accounts/logout`, 
+        {},
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      );
+      return response.data.message;
+   } catch (err) {
+      console.error("Logout failed:", err);
+      throw new Error("Invalid credentials");
+    }
+  },
+  
 };
 
 export default apiService;

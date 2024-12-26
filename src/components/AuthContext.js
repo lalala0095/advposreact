@@ -1,9 +1,12 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import apiService from '../services/apiService';
+import FlashMessage from './FlashMessage';
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
+  const [flashMessage, setFlashMessage] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -30,7 +33,9 @@ const AuthProvider = ({ children }) => {
   };
 
   // Logout function
-  const logout = () => {
+  const logout = async () => {
+    const response = await apiService.logout();
+    setFlashMessage(response);
     localStorage.removeItem('token');
     localStorage.removeItem('account_id');
     setIsAuthenticated(false);
@@ -63,7 +68,9 @@ const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       console.error("Authentication failed:", err);
-      logout();
+      if (err.response?.status === 401) {
+        logout();
+      }
     }
   };
 
@@ -74,6 +81,7 @@ const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout }}>
       {children}
+      {flashMessage && <FlashMessage message={flashMessage} onClose={() => setFlashMessage(null)} />}
     </AuthContext.Provider>
   );
 };
