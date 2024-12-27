@@ -16,6 +16,7 @@ const Signup = () => {
     subscription: "Select Subscription Type",
   });
   const [flashMessage, setFlashMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,93 +28,83 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await apiService.signup(formData);
-    if (response.status === 200) {
-      navigate('/login');
-      setFlashMessage(response.message);
-    } 
-
-    if (response.status === 400) {
-      setFlashMessage(response.detail);
-    } 
-
-      // console.error("Signup failed:", err);
-      // setFlashMessage("Network error. Please check your internet connection.");
-      // Ensure err.response exists before accessing its properties
-      // if (err.response) {
-      //   // Check if the error has a status code
-      //   if (err.response.status === 400) {
-      //     // Check if "detail" exists in the response
-      //     setFlashMessage(
-      //       err.response?.detail || "An error occurred during signup"
-      //     );
-      //   } else {
-      //     setFlashMessage("An unexpected error occurred. Please try again.");
-      //   }
-      // } else {
-      //   // Handle cases where there's no response (network error or other issues)
-      //   setFlashMessage("Network error. Please check your internet connection.");
-      // }
-
-
+    setIsSubmitting(true);
+    setFlashMessage("");
+    try {
+      const response = await apiService.signup(formData);
+      if (response.status === 201) {
+        console.log(response.data.message);
+        navigate('/login', {state: {message: response.data.message + " You may now login."}});
+      } else if (response.status === 400) {
+        setFlashMessage(response.data?.detail);
+      } else {
+        setFlashMessage("An unexpected error occurred. Please try again.");
+      }      
+    } catch (err) {
+      setFlashMessage("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="signup-container" >
-    {flashMessage && <FlashMessage message={flashMessage} />}
-      <div className="signup-box">
-        <h2 className="signup-title">Signup to AdvPOS App</h2>
-        <form onSubmit={handleSubmit} className="signup-form">
-          <input
-            id="username"
-            type="text"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            name="username"  // Using name attribute to bind the state
-            className="signup-input"
-          />
-          <input
-            id="password"
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            name="password"  // Using name attribute to bind the state
-            className="signup-input"
-          />
-          <input
-            id="confirm_password"
-            type="password"
-            placeholder="Confirm Password"
-            value={formData.confirm_password}
-            onChange={handleChange}
-            name="confirm_password"  // Using name attribute to bind the state
-            className="signup-input"
-          />
-          <input
-            id="name"
-            type="text"
-            placeholder="Name"
-            value={formData.name}
-            onChange={handleChange}
-            name="name"  // Using name attribute to bind the state
-            className="signup-input"
-          />
-          <input
-            id="email"
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            name="email"  // Using name attribute to bind the state
-            className="signup-input"
-          />
-          <SubscriptionDropdown value={formData.subscription} onChange={handleChange} />
-          <button type="submit" className="signup-button">
-            Signup
-          </button>
-        </form>
+    <div>
+      {flashMessage && <FlashMessage message={flashMessage} />}
+      <div className="signup-container">
+        <div className="signup-box">
+          <h2 className="signup-title">Signup to AdvPOS App</h2>
+          <form onSubmit={handleSubmit} className="signup-form">
+            <input
+              id="username"
+              type="text"
+              placeholder="Username"
+              value={formData.username}
+              onChange={handleChange}
+              name="username"
+              className="signup-input"
+            />
+            <input
+              id="password"
+              type="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              name="password"
+              className="signup-input"
+            />
+            <input
+              id="confirm_password"
+              type="password"
+              placeholder="Confirm Password"
+              value={formData.confirm_password}
+              onChange={handleChange}
+              name="confirm_password"
+              className="signup-input"
+            />
+            <input
+              id="name"
+              type="text"
+              placeholder="Name"
+              value={formData.name}
+              onChange={handleChange}
+              name="name"
+              className="signup-input"
+            />
+            <input
+              id="email"
+              type="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              name="email"
+              className="signup-input"
+            />
+            <SubscriptionDropdown value={formData.subscription} onChange={handleChange} />
+            <button type="submit" className="signup-button" disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Signup"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

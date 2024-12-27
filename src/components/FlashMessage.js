@@ -6,9 +6,11 @@ const FlashMessageWrapper = styled.div`
   background-color: #28a745; /* Green background for success */
   color: white;
   padding: 10px;
-  margin-bottom: 20px;
+  margin-top: 20px; /* Ensure space between message and form */
   border-radius: 5px;
   text-align: center;
+  width: 100%;
+  margin: 0 auto; /* Center it horizontally */
 `;
 
 const FlashMessage = ({ message }) => {

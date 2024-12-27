@@ -4,6 +4,7 @@ const getToken = () => {
   return localStorage.getItem('token') || '';
 };
 
+
 const apiService = {
   getSubscriptionOptions: async () => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/accounts/get_options`, {
@@ -125,20 +126,22 @@ const apiService = {
   },
 
   signup: async (userData) => {
+    let response;
     try {
-      const response = await axios.post(`${process.env.REACT_APP_FASTAPI_URL}/accounts/signup`, 
+      response = await axios.post(`${process.env.REACT_APP_FASTAPI_URL}/accounts/signup`, 
         userData,
         {
           headers: { Authorization: `Bearer ${getToken()}` },
         }
-      );
-      return response;
-   } catch (err) {
+      );  
+    } catch (err) {
       console.error("Signup failed:", err);
-      throw new Error("Invalid credentials");
+      return err.response;
     }
-  },
-  
+    console.log("response status: " + response.status);
+    // throw new Error("Invalid credentials");
+    return response; 
+  }
 };
 
 export default apiService;

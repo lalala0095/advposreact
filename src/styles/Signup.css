@@ -1,5 +1,3 @@
-/* Signup.css */
-
 body {
   background-color: #252424; /* Dark background for the whole page */
   color: #e0e0e0; /* Light text for dark mode */
@@ -12,6 +10,8 @@ body {
   align-items: center;
   height: 100vh;
   background-color: #121212; /* Dark background */
+  padding: 20px; /* Added padding to prevent edge to edge */
+  box-sizing: border-box; /* Ensures padding is considered within container size */
 }
 
 .signup-box {
@@ -65,6 +65,18 @@ body {
 
 .signup-button:hover {
   background-color: #45a049; /* Darker green on hover */
+}
+
+/* Flash Message Styling */
+.flash-message {
+  color: #fff; /* Light text for the flash message */
+  background-color: #f44336; /* Red background for error */
+  padding: 15px;
+  margin-bottom: 20px; /* Add space between flash message and form */
+  border-radius: 5px;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
 }
 
 /* Dropdown Styles for Signup */

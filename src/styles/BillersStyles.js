@@ -210,7 +210,7 @@ export const SignupDropdownWrapper = styled.div`
     width: 100%;
     background-color: #2e2e2e; /* Dark input background */
     color: #e0e0e0; /* Light text inside the dropdown */
-    max-width: 380px;
+    max-width: 400px;
     transition: border-color 0.3s ease;
   }
 
