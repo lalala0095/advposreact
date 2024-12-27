@@ -22,7 +22,8 @@ origins = [
     "http://localhost:3000",
     "http://120.29.98.34:3000",
     "http://127.0.0.1:3000",
-    "http://13.250.253.210:3000"
+    "http://13.250.253.210:3000",
+    "https://advposapp.com"
 ]
 
 def custom_openapi():
