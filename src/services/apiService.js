@@ -35,10 +35,10 @@ const apiService = {
     return response.data.data.amount_types;
   },
 
-  getBillers: async (page) => {
+  getBillers: async (page, pageLimit) => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/billers`, {
       headers: { Authorization: `Bearer ${getToken()}` },
-      params: { page },
+      params: { "page": page, "limit": pageLimit },
     });
     return response.data;
   },

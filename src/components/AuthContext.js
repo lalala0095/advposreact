@@ -107,6 +107,7 @@ const AuthProvider = ({ children }) => {
   const [flashMessage, setFlashMessage] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);  // Add loading state
 
@@ -115,7 +116,7 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log("AuthContext State:", { isAuthenticated, user, token });
+    console.log("AuthContext State:", { isAuthenticated, user, token, userId });
   }, [isAuthenticated, user, token]);
 
   // Login function: makes the API call and manages token
@@ -147,6 +148,7 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem('account_id');
     setIsAuthenticated(false);
     setUser(null);
+    setUserId(null);
     setToken(null);
     console.log("navigating");
     navigate('/');
@@ -168,6 +170,7 @@ const AuthProvider = ({ children }) => {
 
       setIsAuthenticated(true);
       setUser(response.data.account_object);
+      setUserId(response.data.account_object.sub);
       setToken(token);
 
       const { subscription_expiration } = response.data.account_object;

@@ -1,16 +1,20 @@
-// pages/BillersPage.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BillersTable from '../components/BillersTable';
-import FlashMessage from '../components/FlashMessage'; // Import the new FlashMessage component
-import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton } from '../styles/BillersStyles'
+import FlashMessage from '../components/FlashMessage'; 
+import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, Label, InputField } from '../styles/BillersStyles';
 import { AmountTypeDropdown, BillerTypeDropdown } from '../components/Dropdowns';
+import apiService from '../services/apiService';
 
 const BillersPage = ({ sidebarOpen }) => {
+  const [totalItems, setTotalItems] = useState([]);
+  const [totalPages, setTotalPages] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPageLimit, setCurrentPageLimit] = useState(10);
   const navigate = useNavigate();
   const [flashMessage, setFlashMessage] = useState('');
-  const [showForm, setShowForm] = useState(false); // State to toggle the form visibility
+  const [showForm, setShowForm] = useState(false); 
   const [formData, setFormData] = useState({
     biller_name: '',
     biller_type: '',
@@ -25,19 +29,33 @@ const BillersPage = ({ sidebarOpen }) => {
     setRefreshKey(prevKey => prevKey + 1);
   };
   
-
   const handleFlashMessage = (message) => {
     setFlashMessage(message);
     setTimeout(() => {
-      setFlashMessage(''); // Clear the message after a delay
+      setFlashMessage('');
     }, 3000);
   };
   
+  useEffect(() => {
+    const fetchBillers = async () => {
+      const result = await apiService.getBillers(currentPage, currentPageLimit);
+      setTotalItems(result.data.total_items || 0);
+      setTotalPages(result.data.total_pages || 0);
+    }
+    
+    fetchBillers();
+  }, [currentPage, currentPageLimit]); // Fetch data when page or page limit changes
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handlePageLimitChange = (newLimit) => {
+    setCurrentPageLimit(newLimit);
+  };
 
   const handleAddBiller = async (e) => {
     e.preventDefault();
-  
-    // Prepare the form data to be sent to the backend
     const billerData = {
       biller_name: formData.biller_name,
       biller_type: formData.biller_type,
@@ -52,7 +70,6 @@ const BillersPage = ({ sidebarOpen }) => {
     }
   
     try {
-      // Make the POST request to add the new biller
       const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/billers`, {
         method: 'POST',
         headers: {
@@ -64,33 +81,19 @@ const BillersPage = ({ sidebarOpen }) => {
       const result = await response.json();
   
       if (response.ok) {
-        // Trigger success message
         handleFlashMessage(result.message);
         refreshData();
         setTimeout(() => navigate("/billers"), 2000);
-        // Trigger BillersTable refresh
-        const table = document.querySelector('.billers-table'); // Assuming a class name
-        if (table) {
-          table.refreshData(); // Custom method for fetching updated data
-        }
-      
-        // Navigate or update state
-        setTimeout(() => {
-          navigate("/billers");
-        }, 2000);
       } else {
-        // Error - Handle error response from FastAPI
         const errorDetail = result.response?.detail || 'Something went wrong';
         console.error('Error:', errorDetail);
         handleFlashMessage(`Error: ${errorDetail}`);
       }
     } catch (error) {
-      // Handle any other errors (e.g., network issues)
       console.error('Error adding biller:', error);
       handleFlashMessage('An error occurred while adding the biller.');
     }
   
-    // Clear the form data after submission
     setFormData({
       biller_name: '',
       biller_type: '',
@@ -100,7 +103,7 @@ const BillersPage = ({ sidebarOpen }) => {
       usual_due_date_day: '',
       remarks: '',
     });
-    setShowForm(false); // Hide the form after submission
+    setShowForm(false);
   };
 
   const handleChange = (e) => {
@@ -117,8 +120,19 @@ const BillersPage = ({ sidebarOpen }) => {
             {showForm ? 'Cancel' : 'Add New Biller'}
           </AddButton>
         </Header>
-        {flashMessage && <FlashMessage message={flashMessage} />} {/* Use the FlashMessage component here */}
-        <BillersTable handleFlashMessage={handleFlashMessage} refreshKey={refreshKey} />
+        <div>
+            <Label>Total Billers: {totalItems}</Label>
+            <Label>Total Pages: {totalPages}</Label>
+        </div>
+        {flashMessage && <FlashMessage message={flashMessage} />}
+        <BillersTable 
+          handleFlashMessage={handleFlashMessage}
+          refreshKey={refreshKey}
+          currentPage={currentPage}
+          currentPageLimit={currentPageLimit}
+          onPageChange={handlePageChange}
+          onPageLimitChange={handlePageLimitChange}
+        />
         {showForm && (
           <FormWrapper onSubmit={handleAddBiller}>
             <h3>Add New Biller*</h3>
@@ -174,7 +188,6 @@ const BillersPage = ({ sidebarOpen }) => {
                 onChange={(e) => handleChange(e)}
               />
             </FormRow>
-            {/* Remarks field */}
             <FormRow>
               <label htmlFor="remarks">Remarks</label>
               <textarea

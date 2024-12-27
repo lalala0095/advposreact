@@ -11,31 +11,34 @@ import {
   EditButton,
   DeleteButton,
 } from '../styles/BillersStyles';
-import PaginationControl from './PaginationControl';
 import apiService from '../services/apiService'; // Centralized API service
+import PaginationControl from './PaginationControl';
 
-const BillersTable = ({ refreshKey, handleFlashMessage }) => {
-  const [currentPage, setCurrentPage] = React.useState(1);
+const BillersTable = ({ refreshKey, handleFlashMessage, currentPage, currentPageLimit, onPageChange, onPageLimitChange }) => {
   const navigate = useNavigate();
-  const { billers, totalPages, loading, error } = useBillers(currentPage, refreshKey);
+  const { billers, totalPages, loading, error } = useBillers(currentPage, currentPageLimit, refreshKey);
+  // const [currentPage, setCurrentPage] = React.useState(1);
+  // const [currentPageLimit, setCurrentPageLimit] = React.useState(10);
+  
+  // const forceUpdate = () => {
+  //   setCurrentPage(1)
+  // };
 
-  const forceUpdate = () => {
-    setCurrentPage(1)
-  };
+  // const handlePageChange = (newPage) => setCurrentPage(newPage);
 
-  const handlePageChange = (newPage) => setCurrentPage(newPage);
+  // const handlePageLimitChange = (newPageLimit) => setCurrentPageLimit(newPageLimit);
 
   const handleDelete = async (billerId) => {
     const response = await apiService.deleteBiller(billerId);
     try {
       setTimeout(() => {
-        forceUpdate();
+        // forceUpdate();
         handleFlashMessage(response.data.message + " Refreshing the page.");
         navigate('/cash_flows');
       }, 1000);
     } catch (error) {
       setTimeout(() => {
-        forceUpdate();
+        // forceUpdate();
         console.error(error);
         handleFlashMessage(response.detail + " Refreshing the page.");
         // navigate('/cash_flows');  
@@ -88,8 +91,10 @@ const BillersTable = ({ refreshKey, handleFlashMessage }) => {
       </Table>
       <PaginationControl
         currentPage={currentPage}
+        currentPageLimit={currentPageLimit}
         totalPages={totalPages}
-        handlePageChange={handlePageChange}
+        handlePageChange={onPageChange}
+        handlePageLimitChange={onPageLimitChange}
       />
     </TableWrapper>
   );
