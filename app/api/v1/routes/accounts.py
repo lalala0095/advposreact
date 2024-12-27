@@ -53,7 +53,7 @@ async def admin_signup(admin: AdminSignupRequest):
         new_doc= new_doc,
         error= None
     )
-    return {"message": "Admin account created successfully", 
+    return {"message": "Admin account created successfully.", 
             "account_id": str(inserted_id), 
             "subscription_expiration": expiration}
 
