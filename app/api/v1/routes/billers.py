@@ -12,6 +12,8 @@ from app.core.custom_logging import create_custom_log
 import json
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 @router.post("/")
 async def create_biller(biller: Biller, token_data: dict = Depends(verify_token)):
@@ -153,19 +155,22 @@ async def get_billers(page: int = 1, limit: int = 10, token_data: dict = Depends
     skip = (page - 1) * limit
 
     # Fetch the paginated data from MongoDB
-    billers = await db.billers.find().sort({'date_added': -1}).skip(skip).limit(limit).to_list(length=limit)  
-    if not billers:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No billers found"
-        )  
+    billers = await db.billers.find({"account_id": user_id}).sort({'date_added': -1}).skip(skip).limit(limit).to_list(length=limit)  
+    # if not billers:
+    #     billers = [
+
+    #     ]
+        # raise HTTPException(
+        #     status_code=status.HTTP_404_NOT_FOUND,
+        #     detail="No billers found"
+        # )  
     # logging.debug(billers)
 
     for i in billers:
         i['_id'] = str(i['_id'])
         i['date_added'] = i['date_added'].strftime("%b %d, %Y")
         
-    total_count = await db.billers.count_documents({})
+    total_count = await db.billers.count_documents({"account_id": user_id})
     total_pages = math.ceil(total_count / limit)
    
     await create_custom_log(
