@@ -6,6 +6,13 @@ const getToken = () => {
 
 
 const apiService = {
+  getDailyCashFlows: async () => {
+    const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/report/daily`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response.data;
+  },
+
   getSubscriptionOptions: async () => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/accounts/get_options`, {
       headers: { Authorization: `Bearer ${getToken()}` },
