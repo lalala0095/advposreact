@@ -12,7 +12,9 @@ from typing import List, Dict
 import math
 from app.core.database import redis_client
 import json
+import locale
 
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -218,3 +220,19 @@ async def get_options(token_data: dict = Depends(verify_token)):
     
     return options
     
+@router.get("/report/daily", response_model=List[Dict[str, object]])
+async def get_options(token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    cash_flows_data = await db.cash_flows.find({"user_id": user_id}).to_list(length=None)
+
+    if not cash_flows_data:
+        raise HTTPException(status_code=404, detail="No cash flows found.")
+    
+    df = pd.DataFrame(cash_flows_data)
+    df['date_of_transaction'] = pd.to_datetime(df['date_of_transaction'])
+    df['Day'] = df['date_of_transaction'].dt.day
+    df_pivot = pd.pivot_table(df, values=['amount'], index='Day', aggfunc='sum').reset_index()
+    df_pivot.columns = ['Day', 'Amount']
+    df_pivot['Amount Text'] = df_pivot['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
+
+    return df_pivot.to_dict(orient="records")
