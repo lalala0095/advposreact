@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import apiService from "../services/apiService";
 
-const DailyCashFlowChart = () => {
+const DailyChart = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,8 +19,8 @@ const DailyCashFlowChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiService.getDailyCashFlows();
-        setData(response)
+        const response = await apiService.getDailyReports();
+        setData(response.daily_chart)
       } catch (err) {
         setError("Failed to load data");
         console.error(err);
@@ -71,4 +71,4 @@ const DailyCashFlowChart = () => {
   );
 };
 
-export default DailyCashFlowChart;
+export default DailyChart;

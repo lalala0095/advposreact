@@ -31,3 +31,9 @@ export const LoginMessage = styled.p`
   font-size: 1.2rem;
   width: 100%;
 `;
+
+export const CardWrapper = styled.div`
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+`
