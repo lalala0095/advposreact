@@ -6,6 +6,13 @@ const getToken = () => {
 
 
 const apiService = {
+  getDailyExpenses: async () => {
+    const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/expenses/report/daily`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response.data;
+  },
+
   putExpense: async (expenseId, payload) => {
     const response = await axios.put(`${process.env.REACT_APP_FASTAPI_URL}/expenses/${expenseId}`,
       payload,

@@ -7,11 +7,11 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  Legend,
 } from "recharts";
 import apiService from "../services/apiService";
 
-const DailyCashFlowChart = () => {
+const DailyExpenseChart = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +19,7 @@ const DailyCashFlowChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiService.getDailyCashFlows();
+        const response = await apiService.getDailyExpenses();
         setData(response)
       } catch (err) {
         setError("Failed to load data");
@@ -49,26 +49,22 @@ const DailyCashFlowChart = () => {
         <Tooltip 
             content={({ payload }) => {
                 if (payload && payload.length > 0) {
-                    const { Day, "Cash Flows Label": cashFlowLabel, "Expenses Label": expensesLabel } = payload[0].payload;
+                    const { Day, "Amount Text": amountText } = payload[0].payload;
                     return (
                         <div>
                             <strong>Day: {Day}</strong>
                             <br />
-                            {cashFlowLabel && <strong>Cash Flows: {cashFlowLabel}</strong>}
-                            <br />
-                            {expensesLabel && <strong>Cash Flows: {expensesLabel}</strong>}
+                            <strong>Amount: {amountText}</strong>
                         </div>
                     );
                 }
                 return null;
             }}
         />
-        <Legend />
-        <Bar dataKey="Cash Flows" fill="#8884d8" name="Cash Flows" />
-        <Bar dataKey="Expenses" fill="#82ca9d" name="Expenses" />
+        <Bar dataKey="Amount" fill="#8884d8" />
       </BarChart>
     </ResponsiveContainer>
   );
 };
 
-export default DailyCashFlowChart;
+export default DailyExpenseChart;
