@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { DropdownWrapper, SignupDropdownWrapper } from "../styles/BillersStyles";
 import apiService from "../services/apiService";
 
@@ -178,5 +177,95 @@ export const SubscriptionDropdown = ({ value, onChange }) => {
         )}
       </select>
     </SignupDropdownWrapper>
+  );
+};
+
+
+export const ExpenseTypeDropdown = ({ value, onChange }) => {
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(true); // To track loading state
+
+  useEffect(() => {
+    const fetchExpenseTypes = async () => {
+      try {
+        const response = await apiService.getExpensesOptions();
+        console.log('Expense Types Response:', response);
+        setOptions(response.expense_types || []);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching expense types:", error);
+        setLoading(false);
+      }
+    };
+  
+    fetchExpenseTypes();
+  }, []);
+
+  if (loading) return <div>Loading Expense Types...</div>; // Loading state
+
+  return (
+    <DropdownWrapper>
+      <select
+        name="expense_type"
+        value={value || ""}
+        onChange={onChange}
+        className="form-select"
+      >
+        <option value="">Select Expense Type</option>
+        {options && options.length > 0 ? (
+          options.map((option) => (
+            <option key={option} value={option}>
+              {option.charAt(0).toUpperCase() + option.slice(1)} {/* Capitalize */}
+            </option>
+          ))
+        ) : (
+          <option>No options available</option> // Fallback message if no options
+        )}
+      </select>
+    </DropdownWrapper>
+  );
+};
+
+export const ExpensePlatformDropdown = ({ value, onChange }) => {
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchExpensePlatforms = async () => {
+      try {
+        const response = await apiService.getExpensesOptions();
+        setOptions(response.platforms || []);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching expense platforms:", error);
+        setLoading(false);
+      }
+    };
+  
+    fetchExpensePlatforms();
+  }, []);
+
+  if (loading) return <div>Loading Expense Platforms...</div>; // Loading state
+
+  return (
+    <DropdownWrapper>
+      <select
+        name="platform"
+        value={value || ""}
+        onChange={onChange}
+        className="form-select"
+      >
+        <option value="">Select Expense Platform</option>
+        {options && options.length > 0 ? (
+          options.map((option) => (
+            <option key={option} value={option}>
+              {option.charAt(0).toUpperCase() + option.slice(1)} {/* Capitalize */}
+            </option>
+          ))
+        ) : (
+          <option>No options available</option> // Fallback message if no options
+        )}
+      </select>
+    </DropdownWrapper>
   );
 };

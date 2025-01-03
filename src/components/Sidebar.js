@@ -1,5 +1,5 @@
 // Sidebar.js
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { FaBars, FaHome, FaChartBar, FaCog, FaSignInAlt, FaUserPlus, FaHandHoldingUsd } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
@@ -114,9 +114,9 @@ const Sidebar = ({ onSidebarToggle }) => {
         <FaHandHoldingUsd />
         {isSidebarOpen && 'Cash Flows'}
       </MenuItem>
-      <MenuItem to="/reports" isSidebarOpen={isSidebarOpen}>
+      <MenuItem to="/expenses" isSidebarOpen={isSidebarOpen}>
         <FaChartBar />
-        {isSidebarOpen && 'Reports'}
+        {isSidebarOpen && 'Expenses'}
       </MenuItem>
       <MenuItem to="/settings" isSidebarOpen={isSidebarOpen}>
         <FaCog />

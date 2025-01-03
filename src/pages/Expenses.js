@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BillersTable from '../components/BillersTable';
+import ExpensesTable from '../components/ExpensesTable';
 import FlashMessage from '../components/FlashMessage'; 
 import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, Label } from '../styles/BillersStyles';
-import { AmountTypeDropdown, BillerTypeDropdown } from '../components/Dropdowns';
+import { ExpensePlatformDropdown, ExpenseTypeDropdown } from '../components/Dropdowns';
 import apiService from '../services/apiService';
 
-const BillersPage = ({ sidebarOpen }) => {
+const Expenses = ({ sidebarOpen }) => {
   const [totalItems, setTotalItems] = useState([]);
   const [totalPages, setTotalPages] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -16,13 +16,14 @@ const BillersPage = ({ sidebarOpen }) => {
   const [flashMessage, setFlashMessage] = useState('');
   const [showForm, setShowForm] = useState(false); 
   const [formData, setFormData] = useState({
-    biller_name: '',
-    biller_type: '',
-    custom_type: '',
+    date_of_transaction: '',
+    description: '',
+    expense_type: '',
     amount: '',
-    amount_type: '',
-    usual_due_date_day: '',
+    platform: '',
+    store: '',
     remarks: '',
+    payment_method: '',
   });
 
   const refreshData = () => {
@@ -37,13 +38,13 @@ const BillersPage = ({ sidebarOpen }) => {
   };
   
   useEffect(() => {
-    const fetchBillers = async () => {
-      const result = await apiService.getBillers(currentPage, currentPageLimit);
+    const fetchExpenses = async () => {
+      const result = await apiService.getExpenses(currentPage, currentPageLimit);
       setTotalItems(result.data.total_items || 0);
       setTotalPages(result.data.total_pages || 0);
     }
     
-    fetchBillers();
+    fetchExpenses();
   }, [currentPage, currentPageLimit]); // Fetch data when page or page limit changes
 
   const handlePageChange = (newPage) => {
@@ -54,54 +55,56 @@ const BillersPage = ({ sidebarOpen }) => {
     setCurrentPageLimit(newLimit);
   };
 
-  const handleAddBiller = async (e) => {
+  const handleAddExpense = async (e) => {
     e.preventDefault();
-    const billerData = {
-      biller_name: formData.biller_name,
-      biller_type: formData.biller_type,
-      custom_type: formData.custom_type,
+    const expenseData = {
+      date_of_transaction: formData.date_of_transaction,
+      description: formData.description,
+      expense_type: formData.expense_type,
       amount: formData.amount,
-      amount_type: formData.amount_type,
-      usual_due_date_day: formData.usual_due_date_day,
+      platform: formData.platform,
+      store: formData.store,
       remarks: formData.remarks,
+      payment_method: formData.payment_method,
     };
-    if (formData.usual_due_date_day === '') {
-      delete billerData.usual_due_date_day;
+    if (formData.store === '') {
+      delete expenseData.store;
     }
   
     try {
-      const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/billers`, {
+      const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/expenses`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(billerData),
+        body: JSON.stringify(expenseData),
       });
       const result = await response.json();
   
       if (response.ok) {
         handleFlashMessage(result.message);
         refreshData();
-        setTimeout(() => navigate("/billers"), 2000);
+        setTimeout(() => navigate("/expenses"), 2000);
       } else {
         const errorDetail = result.response?.detail || 'Something went wrong';
         console.error('Error:', errorDetail);
         handleFlashMessage(`Error: ${errorDetail}`);
       }
     } catch (error) {
-      console.error('Error adding biller:', error);
-      handleFlashMessage('An error occurred while adding the biller.');
+      console.error('Error adding expense:', error);
+      handleFlashMessage('An error occurred while adding the expense.');
     }
   
     setFormData({
-      biller_name: '',
-      biller_type: '',
-      custom_type: '',
+      date_of_transaction: '',
+      description: '',
+      expense_type: '',
       amount: '',
-      amount_type: '',
-      usual_due_date_day: '',
+      platform: '',
+      store: '',
       remarks: '',
+      payment_method: '',
     });
     setShowForm(false);
   };
@@ -115,17 +118,17 @@ const BillersPage = ({ sidebarOpen }) => {
     <PageContainer>
       <ContentContainer sidebarOpen={sidebarOpen}>
         <Header>
-          <h1>Manage Billers</h1>
+          <h1>Manage Expenses</h1>
           <AddButton onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancel' : 'Add New Biller'}
+            {showForm ? 'Cancel' : 'Add New Expense'}
           </AddButton>
         </Header>
         <div>
-            <Label>Total Billers: {totalItems}</Label>
+            <Label>Total Expenses: {totalItems}</Label>
             <Label>Total Pages: {totalPages}</Label>
         </div>
         {flashMessage && <FlashMessage message={flashMessage} />}
-        <BillersTable 
+        <ExpensesTable 
           handleFlashMessage={handleFlashMessage}
           refreshKey={refreshKey}
           currentPage={currentPage}
@@ -134,31 +137,32 @@ const BillersPage = ({ sidebarOpen }) => {
           onPageLimitChange={handlePageLimitChange}
         />
         {showForm && (
-          <FormWrapper onSubmit={handleAddBiller}>
-            <h3>Add New Biller*</h3>
+          <FormWrapper onSubmit={handleAddExpense}>
+            <h3>Add New Expense*</h3>
             <FormRow>
-              <label htmlFor="biller_name">Biller Name*</label>
+              <label htmlFor="date_of_transaction">Date of Transaction*</label>
               <input
-                id="biller_name"
-                name="biller_name"
-                value={formData.biller_name || ''}
+                type='date'
+                id="date_of_transaction"
+                name="date_of_transaction"
+                value={formData.date_of_transaction || ''}
                 onChange={handleChange}
               />
             </FormRow>
             <FormRow>
-              <label htmlFor="biller_type">Biller Type*</label>
-              <BillerTypeDropdown
-                value={formData.biller_type}
+              <label htmlFor="description">Description*</label>
+              <input
+                id="description"
+                name="description"
+                value={formData.description || ''}
+                onChange={handleChange}
+              />
+            </FormRow>
+            <FormRow>
+              <label htmlFor="expense_type">Expense Type*</label>
+              <ExpenseTypeDropdown
+                value={formData.expense_type}
                 onChange={(e) => handleChange(e)}
-              />
-            </FormRow>
-            <FormRow>
-              <label htmlFor="custom_type">Custom Type</label>
-              <input
-                id="custom_type"
-                name="custom_type"
-                value={formData.custom_type || ''}
-                onChange={handleChange}
               />
             </FormRow>
             <FormRow>
@@ -172,22 +176,21 @@ const BillersPage = ({ sidebarOpen }) => {
               />
             </FormRow>
             <FormRow>
-              <label htmlFor="usual_due_date_day">Usual Due Date Day</label>
-              <input
-                id="usual_due_date_day"
-                name="usual_due_date_day"
-                type='number'
-                value={formData.usual_due_date_day || ''}
-                onChange={handleChange}
-              />
-            </FormRow>             
-            <FormRow>
-              <label htmlFor="amount_type">Amount Type*</label>
-              <AmountTypeDropdown
-                value={formData.amount_type}
+              <label htmlFor="platform">Platform*</label>
+              <ExpensePlatformDropdown
+                value={formData.platform || ''}
                 onChange={(e) => handleChange(e)}
               />
             </FormRow>
+            <FormRow>
+              <label htmlFor="store">Store</label>
+              <input
+                id="store"
+                name="store"
+                value={formData.store || ''}
+                onChange={handleChange}
+              />
+            </FormRow>   
             <FormRow>
               <label htmlFor="remarks">Remarks</label>
               <textarea
@@ -197,6 +200,15 @@ const BillersPage = ({ sidebarOpen }) => {
                 onChange={handleChange}
               />
             </FormRow>
+            <FormRow>
+              <label htmlFor="payment_method">Payment Method</label>
+              <input
+                id="payment_method"
+                name="payment_method"
+                value={formData.payment_method || ''}
+                onChange={handleChange}
+              />
+            </FormRow>            
             <SubmitButton type="submit">Save</SubmitButton>
           </FormWrapper>
         )}
@@ -205,4 +217,4 @@ const BillersPage = ({ sidebarOpen }) => {
   );
 };
 
-export default BillersPage;
+export default Expenses;

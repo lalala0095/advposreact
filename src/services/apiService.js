@@ -6,6 +6,37 @@ const getToken = () => {
 
 
 const apiService = {
+  putExpense: async (expenseId, payload) => {
+    const response = await axios.put(`${process.env.REACT_APP_FASTAPI_URL}/expenses/${expenseId}`,
+      payload,
+    {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response;
+  },
+
+  getExpensesOptions: async () => {
+    const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/expenses/get_options`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response.data.data;
+  },
+
+  // getExpensePlatformOptions: async () => {
+  //   const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/expenses/get_options`, {
+  //     headers: { Authorization: `Bearer ${getToken()}` },
+  //   });
+  //   return response.data.data.platforms;
+  // },
+
+  getExpenses: async (page, pageLimit) => {
+    const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/expenses`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+      params: { "page": page, "limit": pageLimit },
+    });
+    return response.data;
+  },
+
   getDailyCashFlows: async () => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/cash_flows/report/daily`, {
       headers: { Authorization: `Bearer ${getToken()}` },

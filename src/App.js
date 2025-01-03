@@ -16,6 +16,8 @@ import CashFlows from './pages/CashFlows';
 import EditCashFlow from './pages/EditCashFlow';
 import Settings from './pages/Settings';
 import Signup from './pages/Signup';
+import Expenses from './pages/Expenses';
+import EditExpensePage from './pages/EditExpense';
 
 import AuthProvider from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -56,6 +58,15 @@ const App = () => {
                       </ProtectedRoute>
                     }
                   />
+                  <Route path="/edit-expense/:expenseId" element={<EditExpensePage />} />
+                  <Route
+                    path="/expenses"
+                    element={
+                      <ProtectedRoute>
+                        <Expenses />
+                      </ProtectedRoute>
+                    }
+                  />                  
                   <Route path="/edit-cash_flow/:cash_flowId" element={<EditCashFlow />} />
                   <Route
                     path="/cash_flows"
