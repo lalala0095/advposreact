@@ -12,6 +12,7 @@ import math
 from typing import List, Dict
 from app.core.database import redis_client
 import json
+import locale
 
 # logging.basicConfig(
 #     level=logging.DEBUG
@@ -233,3 +234,20 @@ async def get_options(token_data: dict = Depends(verify_token)):
     redis_client.set('expenses_options', json.dumps(options), ex=0)  # Set expiration to 0 (no expiration)
     
     return options
+
+@router.get("/report/daily", response_model=List[Dict[str, object]])
+async def get_options(token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    expenses_data = await db.expenses.find({"user_id": user_id}).to_list(length=None)
+
+    if not expenses_data:
+        raise HTTPException(status_code=404, detail="No expenses found.")
+    
+    df = pd.DataFrame(expenses_data)
+    df['date_of_transaction'] = pd.to_datetime(df['date_of_transaction'])
+    df['Day'] = df['date_of_transaction'].dt.strftime("%b %d")
+    df_pivot = pd.pivot_table(df, values=['amount'], index='Day', aggfunc='sum').reset_index()
+    df_pivot.columns = ['Day', 'Amount']
+    df_pivot['Amount Text'] = df_pivot['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
+
+    return df_pivot.to_dict(orient="records")

@@ -233,16 +233,27 @@ async def get_options(token_data: dict = Depends(verify_token)):
 @router.get("/report/daily", response_model=List[Dict[str, object]])
 async def get_options(token_data: dict = Depends(verify_token)):
     user_id = token_data['account_id']
-    cash_flows_data = await db.cash_flows.find({"user_id": user_id}).to_list(length=None)
+    cash_flows_data = await db.cash_flows.find({"user_id": user_id}, {"date_of_transaction": 1, "amount": 1}).to_list(length=None)
 
-    if not cash_flows_data:
-        raise HTTPException(status_code=404, detail="No cash flows found.")
+    # if not cash_flows_data:
+    #     raise HTTPException(status_code=404, detail="No cash flows found.")
     
-    df = pd.DataFrame(cash_flows_data)
-    df['date_of_transaction'] = pd.to_datetime(df['date_of_transaction'])
-    df['Day'] = df['date_of_transaction'].dt.day
-    df_pivot = pd.pivot_table(df, values=['amount'], index='Day', aggfunc='sum').reset_index()
-    df_pivot.columns = ['Day', 'Amount']
-    df_pivot['Amount Text'] = df_pivot['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
+    df_cash_flows = pd.DataFrame(cash_flows_data)
+    df_cash_flows['date_of_transaction'] = pd.to_datetime(df_cash_flows['date_of_transaction'])
+    df_cash_flows['Day'] = df_cash_flows['date_of_transaction'].dt.strftime("%b %d")
+    df_pivot_cf = pd.pivot_table(df_cash_flows, values=['amount'], index='Day', aggfunc='sum').reset_index()
+    df_pivot_cf.columns = ['Day', 'Amount']
+    df_pivot_cf['Amount Text'] = df_pivot_cf['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
 
-    return df_pivot.to_dict(orient="records")
+    expenses_data = await db.expenses.find({"user_id": user_id}, {"date_of_transaction": 1, "amount": 1}).to_list(length=None)
+    df_expenses = pd.DataFrame(expenses_data)
+    df_expenses['date_of_transaction'] = pd.to_datetime(df_expenses['date_of_transaction'])
+    df_expenses['Day'] = df_expenses['date_of_transaction'].dt.strftime("%b %d")
+    df_pivot_exp = pd.pivot_table(df_expenses, values=['amount'], index='Day', aggfunc='sum').reset_index()
+    df_pivot_exp.columns = ['Day', 'Amount']
+    df_pivot_exp['Amount Text'] = df_pivot_exp['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
+
+    df_report = pd.merge(left=df_pivot_cf, right=df_pivot_exp, how='outer', on='Day')
+    df_report.columns = ['Day', 'Cash Flows', 'Cash Flows Label', 'Expenses', 'Expenses Label']
+
+    return df_report.to_dict(orient="records")

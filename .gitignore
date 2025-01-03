@@ -11,3 +11,5 @@ app/api/v1/routes/tests.py
 app/__pycache__/
 my-react-app
 package-lock.json
+Dockerfile
+.dockerignore
