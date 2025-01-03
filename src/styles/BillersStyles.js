@@ -81,9 +81,26 @@ export const TextArea = styled.textarea`
 `;
 
 export const SubmitButton = styled.button`
-  width: 100%;
+  width: 30%;
+  margin-right: 10px;
   padding: 10px;
   background-color: #007bff;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+export const CancelButton = styled.button`
+  width: 30%;
+  margin-left: 150px;
+  padding: 10px;
+  background-color:rgb(220, 74, 16);
   border: none;
   color: #fff;
   font-size: 16px;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FormWrapper, FormRow, Label, InputField, TextArea, SubmitButton, PageContainer, ContentContainer } from "../styles/BillersStyles";
+import { FormWrapper, FormRow, Label, InputField, TextArea, SubmitButton, PageContainer, ContentContainer, CancelButton } from "../styles/BillersStyles";
 import { AmountTypeDropdown, BillerTypeDropdown } from "../components/Dropdowns";
 import FlashMessage from "../components/FlashMessage";
 import useBillers from "../hooks/useBillers";
@@ -23,6 +23,10 @@ const EditBillerPage = () => {
     usual_due_date_day: "",
     remarks: "",
   });
+
+  const handleCancel = () => {
+    navigate('/billers');
+  };
 
   const handleFlashMessage = (message) => {
     setFlashMessage(message);
@@ -138,6 +142,7 @@ const EditBillerPage = () => {
               />
             </FormRow>
             <SubmitButton type="submit" onClick={handleSubmit}>Save Changes</SubmitButton>
+            <CancelButton type="button" onClick={handleCancel}>Cancel</CancelButton>
           </form>
         </FormWrapper>
       </ContentContainer>

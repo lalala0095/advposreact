@@ -11,6 +11,7 @@ const CardContainer = styled.div`
   text-align: center;
   flex: 1;
   margin: 10px;
+  max-height: 80px
 `;
 
 const Title = styled.h3`

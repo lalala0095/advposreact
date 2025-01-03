@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FormWrapper, FormRow, Label, InputField, TextArea, SubmitButton, PageContainer, ContentContainer } from "../styles/BillersStyles";
+import { FormWrapper, FormRow, Label, InputField, TextArea, SubmitButton, PageContainer, ContentContainer, CancelButton } from "../styles/BillersStyles";
 import { AmountTypeDropdown, CashFlowTypeDropdown } from "../components/Dropdowns";
 import FlashMessage from "../components/FlashMessage";
 import useCashFlows from "../hooks/useCashFlows";
@@ -56,6 +56,10 @@ const EditCashFlowPage = () => {
       ...prevData,
       [name]: value,
     }));
+  };
+
+  const handleCancel = () => {
+    navigate('/cash_flows');
   };
 
   const handleSubmit = async (e) => {
@@ -138,6 +142,7 @@ const EditCashFlowPage = () => {
               />
             </FormRow>
             <SubmitButton type="submit" onClick={handleSubmit}>Save Changes</SubmitButton>
+            <CancelButton type="button" onClick={handleCancel}>Cancel</CancelButton>
           </form>
         </FormWrapper>
       </ContentContainer>

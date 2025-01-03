@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FormWrapper, FormRow, Label, TextArea, SubmitButton, PageContainer, ContentContainer } from "../styles/BillersStyles";
+import { FormWrapper, FormRow, Label, TextArea, SubmitButton, PageContainer, ContentContainer, CancelButton } from "../styles/BillersStyles";
 import { ExpensePlatformDropdown, ExpenseTypeDropdown } from "../components/Dropdowns";
 import FlashMessage from "../components/FlashMessage";
 import useExpenses from "../hooks/useExpenses";
@@ -27,6 +27,10 @@ const EditExpensePage = () => {
 
   const handleFlashMessage = (message) => {
     setFlashMessage(message);
+  };
+
+  const handleCancel = () => {
+    navigate('/expenses');
   };
 
   // Set the expense data when fetched
@@ -171,6 +175,7 @@ const EditExpensePage = () => {
               />
             </FormRow>
             <SubmitButton type="submit" onClick={handleSubmit}>Save Changes</SubmitButton>
+            <CancelButton type="button" onClick={handleCancel}>Cancel</CancelButton>
           </form>
         </FormWrapper>
       </ContentContainer>
