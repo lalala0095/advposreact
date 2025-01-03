@@ -7,5 +7,8 @@ class DashboardResponse(BaseModel):
     which_is_higher: str
     difference: str
     daily_chart: List[Dict[str, Any]]
+    cash_flow_type_breakdown: List[Dict[str, Any]]
+    expense_type_breakdown: List[Dict[str, Any]]
+
 
 
