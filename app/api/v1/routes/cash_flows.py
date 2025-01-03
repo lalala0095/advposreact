@@ -132,7 +132,17 @@ async def get_cash_flows(page: int = 1, limit: int = 10, token_data: dict = Depe
     skip = (page - 1) * limit
 
     # Fetch the paginated data from MongoDB
-    cash_flows = await db.cash_flows.find().sort({"date_added": -1}).skip(skip).limit(limit).to_list(length=limit)
+    cash_flows = await db.cash_flows.find({"user_id": user_id}).sort({"date_added": -1}).skip(skip).limit(limit).to_list(length=limit)
+    if not cash_flows:
+        return {
+            "data": {
+                "limit": limit,
+                "page": page,
+                "total_pages": 1,
+                "total_items": 0,
+                "items": []
+            }
+        }
     new_cash_flows = []
     for i in cash_flows:
         i['_id'] = str(i['_id'])

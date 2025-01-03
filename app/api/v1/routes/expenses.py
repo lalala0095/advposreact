@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from app.core.database import db
 from passlib.context import CryptContext
-from app.models.expenses import Expenses 
+from app.models.expenses import Expenses, ExpenseType, ExpensePlatform
 import pandas as pd
 from bson import ObjectId
 from app.core.auth import verify_token, oauth2_scheme
@@ -10,6 +10,8 @@ from datetime import datetime
 from app.core.custom_logging import create_custom_log
 import math
 from typing import List, Dict
+from app.core.database import redis_client
+import json
 
 # logging.basicConfig(
 #     level=logging.DEBUG
@@ -25,16 +27,16 @@ async def create_expense(expense: Expenses, token_data: dict = Depends(verify_to
     expense_data = {
         "date_added": datetime.now(),
         "user_id": user_id,
-        "date_of_transaction": pd.to_datetime(expense.date_of_transaction),
+        "date_of_transaction": pd.to_datetime(expense.date_of_transaction).strftime("%Y-%m-%d"),
         "description": expense.description,
-        "price": expense.price,
+        "amount": expense.amount,
         "expense_type": expense.expense_type.value,
         "platform": expense.platform.value,
         "store": expense.store,
         "remarks": expense.remarks,
         "payment_method": expense.payment_method
     }
-    print(expense_data)
+    logging.debug(expense_data)
     result = await db.expenses.insert_one(expense_data)
     object_id = str(result.inserted_id)
     new_doc = await db.expenses.find_one({"_id": ObjectId(result.inserted_id)})
@@ -62,7 +64,7 @@ async def update_expense(expense_id: str, updated_expense: Expenses, token_data:
 
     # Convert Pydantic model to dictionary and process the date field
     updated_data = updated_expense.dict()
-    updated_data["date_of_transaction"] = pd.to_datetime(updated_data["date_of_transaction"])
+    updated_data["date_of_transaction"] = pd.to_datetime(updated_data["date_of_transaction"]).strftime("%Y-%m-%d")
     updated_data["date_updated"] = datetime.now()
     updated_data['expense_type'] = updated_data['expense_type'].value
     updated_data['platform'] = updated_data['platform'].value
@@ -122,6 +124,39 @@ async def delete_expense(expense_id: str, token_data: dict = Depends(verify_toke
 
     return {"message": "Expense deleted successfully"}
 
+@router.get("/get_expense/{expense_id}", response_model=Dict[str, Dict[str, object]])
+async def get_expense(expense_id: str, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+    payload = token_data['payload']
+
+    expense = await db.expenses.find_one({"_id": ObjectId(expense_id)})
+    expense["_id"] = str(expense['_id'])
+    # expense['date_added'] = expense['date_added'].strftime('%Y-%m-%d')
+    expense['date_of_transaction'] = expense['date_of_transaction'].strftime('%Y-%m-%d')
+    logging.debug(expense['date_of_transaction'])
+    # Check if no expenses were found
+    if not expense:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No expense found"
+        )
+    
+    await create_custom_log(
+        event= "get one expense",
+        user_id = user_id,
+        account_id = user_id,
+        objectid=None,
+        page_number= None,
+        new_doc = None,
+        error= None
+    )
+    
+    return {
+        "data": {
+            "item": expense
+        }
+    }
+    
 
 @router.get("/", response_model=Dict[str, object])
 async def get_expenses(page: int = 1, limit: int = 10, token_data: dict = Depends(verify_token)):
@@ -135,7 +170,17 @@ async def get_expenses(page: int = 1, limit: int = 10, token_data: dict = Depend
     skip = (page - 1) * limit
 
     # Fetch the paginated data from MongoDB
-    expenses = await db.expenses.find().skip(skip).limit(limit).to_list(length=limit)
+    expenses = await db.expenses.find({"user_id": user_id}).skip(skip).limit(limit).to_list(length=limit)
+    if not expenses:
+        return {
+            "data": {
+                "limit": limit,
+                "page": page,
+                "total_pages": 1,
+                "total_items": 0,
+                "items": []
+            }
+        }
     for i in expenses:
         i['_id'] = str(i['_id'])
 
@@ -167,3 +212,24 @@ async def get_expenses(page: int = 1, limit: int = 10, token_data: dict = Depend
         }
     }
     
+
+@router.get("/get_options", response_model=Dict[str, Dict[str, object]])
+async def get_options(token_data: dict = Depends(verify_token)):
+    cached_options = await redis_client.get('expenses_options')
+    
+    if cached_options:
+        # Return from cache if available
+        return json.loads(cached_options)
+
+    # If not in cache, generate options
+    options = {
+        "data": {
+            "expense_types": [expense_type.value for expense_type in ExpenseType],
+            "platforms": [platform.value for platform in ExpensePlatform]
+        }
+    }
+    
+    # Cache the options for future use (no expiration)
+    redis_client.set('expenses_options', json.dumps(options), ex=0)  # Set expiration to 0 (no expiration)
+    
+    return options
