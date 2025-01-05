@@ -14,7 +14,6 @@ from app.core.database import redis_client
 import json
 import locale
 
-locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

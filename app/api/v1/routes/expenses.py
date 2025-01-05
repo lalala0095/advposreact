@@ -248,6 +248,7 @@ async def get_options(token_data: dict = Depends(verify_token)):
     df['Day'] = df['date_of_transaction'].dt.strftime("%b %d")
     df_pivot = pd.pivot_table(df, values=['amount'], index='Day', aggfunc='sum').reset_index()
     df_pivot.columns = ['Day', 'Amount']
+
     df_pivot['Amount Text'] = df_pivot['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
 
     return df_pivot.to_dict(orient="records")

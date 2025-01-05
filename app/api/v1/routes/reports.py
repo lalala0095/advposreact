@@ -10,7 +10,6 @@ from app.core.database import redis_client
 import locale
 from app.models.reports import DashboardResponse
 
-locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 router = APIRouter()
 
 @router.get("/dashboard", response_model=DashboardResponse)
