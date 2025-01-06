@@ -1,7 +1,7 @@
 // Sidebar.js
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
-import { FaBars, FaHome, FaChartBar, FaCog, FaSignInAlt, FaUserPlus, FaHandHoldingUsd } from 'react-icons/fa';
+import { FaBars, FaHome, FaChartBar, FaCog, FaSignInAlt, FaUserPlus, FaHandHoldingUsd, FaAddressCard } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 
@@ -117,6 +117,10 @@ const Sidebar = ({ onSidebarToggle }) => {
       <MenuItem to="/expenses" isSidebarOpen={isSidebarOpen}>
         <FaChartBar />
         {isSidebarOpen && 'Expenses'}
+      </MenuItem>
+      <MenuItem to="/about_the_dev" isSidebarOpen={isSidebarOpen}>
+        <FaAddressCard />
+        {isSidebarOpen && 'About Us'}
       </MenuItem>
       <MenuItem to="/settings" isSidebarOpen={isSidebarOpen}>
         <FaCog />

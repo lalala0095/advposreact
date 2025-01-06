@@ -4,8 +4,13 @@ import styled from 'styled-components';
 const HeaderWrapper = styled.div`
   background-color: #333;
   padding: 20px;
-  text-align: center;
   color: #fff;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 1rem;
 `;
 
 const Header = () => {

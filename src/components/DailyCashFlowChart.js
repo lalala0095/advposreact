@@ -11,38 +11,18 @@ import {
 } from "recharts";
 import apiService from "../services/apiService";
 
-const DailyChart = () => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await apiService.getDailyReports();
-        setData(response.daily_chart)
-      } catch (err) {
-        setError("Failed to load data");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
+const DailyChart = ({ data_input }) => {
+  const chartData = data_input.map(item => ({
+    Day: item["Day"],
+    "Cash Flows": item["Cash Flows"],
+    "Expenses": item["Expenses"],
+    "Cash Flows Label": item["Cash Flows Label"],
+    "Expenses Label": item["Expenses Label"],
+  }));
 
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+    <ResponsiveContainer width="100%" height={400} >
+      <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="Day" />
         <YAxis />

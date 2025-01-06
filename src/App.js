@@ -18,6 +18,7 @@ import Settings from './pages/Settings';
 import Signup from './pages/Signup';
 import Expenses from './pages/Expenses';
 import EditExpensePage from './pages/EditExpense';
+import AboutTheDev from './pages/About Us';
 
 import AuthProvider from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -82,6 +83,12 @@ const App = () => {
                       <ProtectedRoute>
                         <Reports />
                       </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/about_the_dev"
+                    element={
+                        <AboutTheDev />
                     }
                   />
                 </Routes>

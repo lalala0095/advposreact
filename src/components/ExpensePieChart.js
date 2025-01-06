@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const ExpensePieChart = ({ data }) => {
   const chartData = data.map(item => ({
@@ -11,6 +11,7 @@ const ExpensePieChart = ({ data }) => {
   const COLORS = ["#4BC0C0", "#FF9F40", "#23781e", "9ca2d1", "ef8ae1"];
 
   return (
+    <ResponsiveContainer width="100%" height={400}>
     <PieChart height={400} width={400}>
       <Pie
         data={chartData}
@@ -67,6 +68,7 @@ const ExpensePieChart = ({ data }) => {
         }}
       />
     </PieChart>
+    </ResponsiveContainer>
   );
 };
 
