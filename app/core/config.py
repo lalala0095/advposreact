@@ -12,4 +12,3 @@ class Settings(BaseSettings):
 
 # Create a settings instance
 settings = Settings()
-print(F"S3 BUCKET BASE URL: {settings.s3_base_url}")

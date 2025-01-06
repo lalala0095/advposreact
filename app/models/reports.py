@@ -9,6 +9,7 @@ class DashboardResponse(BaseModel):
     daily_chart: List[Dict[str, Any]]
     cash_flow_type_breakdown: List[Dict[str, Any]]
     expense_type_breakdown: List[Dict[str, Any]]
+    platform_breakdown_exp: List[Dict[str, Any]]
 
 
 

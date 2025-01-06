@@ -28,7 +28,7 @@ async def get_options(token_data: dict = Depends(verify_token)):
     df_type_breakdown_cf.columns = ['Cash Flow Type', 'Amount']
     df_type_breakdown_cf['Amount Text'] = df_type_breakdown_cf['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
 
-    expenses_data = await db.expenses.find({"user_id": user_id}, {"date_of_transaction": 1, "amount": 1, "expense_type": 1}).to_list(length=None)
+    expenses_data = await db.expenses.find({"user_id": user_id}, {"date_of_transaction": 1, "amount": 1, "expense_type": 1, "platform": 1}).to_list(length=None)
     df_expenses = pd.DataFrame(expenses_data)
     df_expenses['date_of_transaction'] = pd.to_datetime(df_expenses['date_of_transaction'])
     df_expenses['Day'] = df_expenses['date_of_transaction'].dt.strftime("%b %d")
@@ -39,6 +39,10 @@ async def get_options(token_data: dict = Depends(verify_token)):
     df_type_breakdown_exp = pd.pivot_table(df_expenses, values=['amount'], index='expense_type', aggfunc='sum').reset_index()
     df_type_breakdown_exp.columns = ['Expense Type', 'Amount']
     df_type_breakdown_exp['Amount Text'] = df_type_breakdown_exp['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
+
+    df_platform_breakdown_exp = pd.pivot_table(df_expenses, values=['amount'], index='platform', aggfunc='sum').reset_index()
+    df_platform_breakdown_exp.columns = ['Platform', 'Amount']
+    df_platform_breakdown_exp['Amount Text'] = df_platform_breakdown_exp['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
 
     df_report = pd.merge(left=df_pivot_cf, right=df_pivot_exp, how='outer', on='Day')
     df_report.columns = ['Day', 'Cash Flows', 'Cash Flows Label', 'Expenses', 'Expenses Label']
@@ -61,6 +65,7 @@ async def get_options(token_data: dict = Depends(verify_token)):
 
     cash_flow_type_breakdown = df_type_breakdown_cf.to_dict(orient="records")
     expense_type_breakdown = df_type_breakdown_exp.to_dict(orient="records")
+    platform_breakdown_exp = df_platform_breakdown_exp.to_dict(orient="records")
     daily_chart = df_report.to_dict(orient="records")
 
     return {
@@ -70,5 +75,6 @@ async def get_options(token_data: dict = Depends(verify_token)):
         "difference": f"₱{locale.format_string('%.2f', difference, grouping=True)}",
         "daily_chart": daily_chart,
         "cash_flow_type_breakdown": cash_flow_type_breakdown,
-        "expense_type_breakdown": expense_type_breakdown
+        "expense_type_breakdown": expense_type_breakdown,
+        "platform_breakdown_exp": platform_breakdown_exp
     }
