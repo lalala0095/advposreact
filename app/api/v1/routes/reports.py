@@ -16,10 +16,21 @@ router = APIRouter()
 async def get_options(token_data: dict = Depends(verify_token)):
     user_id = token_data['account_id']
     cash_flows_data = await db.cash_flows.find({"user_id": user_id}, {"date_of_transaction": 1, "amount": 1, "cash_flow_type": 1}).to_list(length=None)
+    expenses_data = await db.expenses.find({"user_id": user_id}, {"date_of_transaction": 1, "amount": 1, "expense_type": 1, "platform": 1}).to_list(length=None)
 
-    df_cash_flows = pd.DataFrame(cash_flows_data)
-    df_cash_flows['date_of_transaction'] = pd.to_datetime(df_cash_flows['date_of_transaction'])
-    df_cash_flows['Day'] = df_cash_flows['date_of_transaction'].dt.strftime("%b %d")
+    if not cash_flows_data:
+        total_cash_flows = 0
+        expense_type_breakdown = []
+        platform_breakdown_exp = []
+        df_cash_flows = pd.DataFrame([{
+            "Day": "No data. Add data to show analysis.",
+            "amount": 0
+        }])
+    else:
+        df_cash_flows = pd.DataFrame(cash_flows_data)
+        df_cash_flows['date_of_transaction'] = pd.to_datetime(df_cash_flows['date_of_transaction'])
+        df_cash_flows['Day'] = df_cash_flows['date_of_transaction'].dt.strftime("%b %d")
+
     df_pivot_cf = pd.pivot_table(df_cash_flows, values=['amount'], index='Day', aggfunc='sum').reset_index()
     df_pivot_cf.columns = ['Day', 'Amount']
     df_pivot_cf['Amount Text'] = df_pivot_cf['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
@@ -28,10 +39,19 @@ async def get_options(token_data: dict = Depends(verify_token)):
     df_type_breakdown_cf.columns = ['Cash Flow Type', 'Amount']
     df_type_breakdown_cf['Amount Text'] = df_type_breakdown_cf['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
 
-    expenses_data = await db.expenses.find({"user_id": user_id}, {"date_of_transaction": 1, "amount": 1, "expense_type": 1, "platform": 1}).to_list(length=None)
-    df_expenses = pd.DataFrame(expenses_data)
-    df_expenses['date_of_transaction'] = pd.to_datetime(df_expenses['date_of_transaction'])
-    df_expenses['Day'] = df_expenses['date_of_transaction'].dt.strftime("%b %d")
+    if not expenses_data:
+        total_expenses = 0
+        cash_flow_type_breakdown = []
+        df_expenses = pd.DataFrame([{
+            "Day": "No data. Add data to show analysis.",
+            "amount": 0,
+            "platform": "No data. Add data to show analysis."
+        }])        
+    else:
+        df_expenses = pd.DataFrame(expenses_data)
+        df_expenses['date_of_transaction'] = pd.to_datetime(df_expenses['date_of_transaction'])
+        df_expenses['Day'] = df_expenses['date_of_transaction'].dt.strftime("%b %d")
+
     df_pivot_exp = pd.pivot_table(df_expenses, values=['amount'], index='Day', aggfunc='sum').reset_index()
     df_pivot_exp.columns = ['Day', 'Amount']
     df_pivot_exp['Amount Text'] = df_pivot_exp['Amount'].apply(lambda x: f"₱{locale.format_string('%.2f', x, grouping=True)}")
