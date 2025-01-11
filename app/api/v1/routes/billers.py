@@ -12,8 +12,8 @@ from app.core.custom_logging import create_custom_log
 import json
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
 @router.post("/")
 async def create_biller(biller: Biller, token_data: dict = Depends(verify_token)):

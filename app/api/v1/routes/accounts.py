@@ -17,7 +17,7 @@ router = APIRouter()
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # tokenUrl points to the /login endpoint
 expiration_duration = 3600
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def admin_signup(admin: AdminSignupRequest):
