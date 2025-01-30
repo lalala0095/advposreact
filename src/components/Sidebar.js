@@ -1,9 +1,10 @@
 // Sidebar.js
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
-import { FaBars, FaHome, FaChartBar, FaCog, FaSignInAlt, FaUserPlus, FaHandHoldingUsd, FaAddressCard } from 'react-icons/fa';
+import { FaPiggyBank, FaBars, FaHome, FaChartBar, FaCog, FaSignInAlt, FaUserPlus, FaHandHoldingUsd, FaAddressCard } from 'react-icons/fa';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
+import { FaMoneyBill1Wave } from 'react-icons/fa6';
 
 const SidebarWrapper = styled.div`
   width: ${(props) => (props.isSidebarOpen ? '250px' : '60px')};
@@ -108,12 +109,16 @@ const Sidebar = ({ onSidebarToggle }) => {
         {isSidebarOpen && 'Billers'}
       </MenuItem>
       <MenuItem to="/cash_flows" isSidebarOpen={isSidebarOpen}>
-        <FaHandHoldingUsd />
+        <FaMoneyBill1Wave />
         {isSidebarOpen && 'Cash Flows'}
       </MenuItem>
       <MenuItem to="/expenses" isSidebarOpen={isSidebarOpen}>
         <FaChartBar />
         {isSidebarOpen && 'Expenses'}
+      </MenuItem>
+      <MenuItem to="/planners" isSidebarOpen={isSidebarOpen}>
+        <FaPiggyBank />
+        {isSidebarOpen && 'Planners'}
       </MenuItem>
       <MenuItem to="/about_the_dev" isSidebarOpen={isSidebarOpen}>
         <FaAddressCard />

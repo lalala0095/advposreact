@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ExpensesTable from '../components/ExpensesTable';
+import PlannersTable from '../components/PlannersTable';
 import FlashMessage from '../components/FlashMessage'; 
 import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, Label } from '../styles/BillersStyles';
-import { ExpensePlatformDropdown, ExpenseTypeDropdown } from '../components/Dropdowns';
+import { PlannerPlatformDropdown, PlannerTypeDropdown } from '../components/Dropdowns';
 import apiService from '../services/apiService';
 
-const Expenses = ({ sidebarOpen }) => {
+const Planners = ({ sidebarOpen }) => {
   const [totalItems, setTotalItems] = useState([]);
   const [totalPages, setTotalPages] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -18,7 +18,7 @@ const Expenses = ({ sidebarOpen }) => {
   const [formData, setFormData] = useState({
     date_of_transaction: '',
     description: '',
-    expense_type: '',
+    planner_type: '',
     amount: '',
     platform: '',
     store: '',
@@ -38,13 +38,13 @@ const Expenses = ({ sidebarOpen }) => {
   };
   
   useEffect(() => {
-    const fetchExpenses = async () => {
-      const result = await apiService.getExpenses(currentPage, currentPageLimit);
+    const fetchPlanners = async () => {
+      const result = await apiService.getPlanners(currentPage, currentPageLimit);
       setTotalItems(result.data.total_items || 0);
       setTotalPages(result.data.total_pages || 0);
     }
     
-    fetchExpenses();
+    fetchPlanners();
   }, [currentPage, currentPageLimit]); // Fetch data when page or page limit changes
 
   const handlePageChange = (newPage) => {
@@ -55,12 +55,12 @@ const Expenses = ({ sidebarOpen }) => {
     setCurrentPageLimit(newLimit);
   };
 
-  const handleAddExpense = async (e) => {
+  const handleAddPlanner = async (e) => {
     e.preventDefault();
-    const expenseData = {
+    const plannerData = {
       date_of_transaction: formData.date_of_transaction,
       description: formData.description,
-      expense_type: formData.expense_type,
+      planner_type: formData.planner_type,
       amount: formData.amount,
       platform: formData.platform,
       store: formData.store,
@@ -68,38 +68,38 @@ const Expenses = ({ sidebarOpen }) => {
       payment_method: formData.payment_method,
     };
     if (formData.store === '') {
-      delete expenseData.store;
+      delete plannerData.store;
     }
   
     try {
-      const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/expenses`, {
+      const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/planners`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(expenseData),
+        body: JSON.stringify(plannerData),
       });
       const result = await response.json();
   
       if (response.ok) {
         handleFlashMessage(result.message);
         refreshData();
-        setTimeout(() => navigate("/expenses"), 2000);
+        setTimeout(() => navigate("/planners"), 2000);
       } else {
         const errorDetail = result.response?.detail || 'Something went wrong';
         console.error('Error:', errorDetail);
         handleFlashMessage(`Error: ${errorDetail}`);
       }
     } catch (error) {
-      console.error('Error adding expense:', error);
-      handleFlashMessage('An error occurred while adding the expense.');
+      console.error('Error adding planner:', error);
+      handleFlashMessage('An error occurred while adding the planner.');
     }
   
     setFormData({
       date_of_transaction: '',
       description: '',
-      expense_type: '',
+      planner_type: '',
       amount: '',
       platform: '',
       store: '',
@@ -118,17 +118,17 @@ const Expenses = ({ sidebarOpen }) => {
     <PageContainer>
       <ContentContainer sidebarOpen={sidebarOpen}>
         <Header>
-          <h1>Manage Expenses</h1>
+          <h1>Manage Planners</h1>
           <AddButton onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancel' : 'Add New Expense'}
+            {showForm ? 'Cancel' : 'Add New Planner'}
           </AddButton>
         </Header>
         <div>
-            <Label>Total Expenses: {totalItems}</Label>
+            <Label>Total Planners: {totalItems}</Label>
             <Label>Total Pages: {totalPages}</Label>
         </div>
         {flashMessage && <FlashMessage message={flashMessage} />}
-        <ExpensesTable 
+        <PlannersTable 
           handleFlashMessage={handleFlashMessage}
           refreshKey={refreshKey}
           currentPage={currentPage}
@@ -137,8 +137,8 @@ const Expenses = ({ sidebarOpen }) => {
           onPageLimitChange={handlePageLimitChange}
         />
         {showForm && (
-          <FormWrapper onSubmit={handleAddExpense}>
-            <h3>Add New Expense*</h3>
+          <FormWrapper onSubmit={handleAddPlanner}>
+            <h3>Add New Planner*</h3>
             <FormRow>
               <label htmlFor="date_of_transaction">Date of Transaction*</label>
               <input
@@ -159,13 +159,6 @@ const Expenses = ({ sidebarOpen }) => {
               />
             </FormRow>
             <FormRow>
-              <label htmlFor="expense_type">Expense Type*</label>
-              <ExpenseTypeDropdown
-                value={formData.expense_type}
-                onChange={(e) => handleChange(e)}
-              />
-            </FormRow>
-            <FormRow>
               <label htmlFor="amount">Amount*</label>
               <input
                 id="amount"
@@ -173,13 +166,6 @@ const Expenses = ({ sidebarOpen }) => {
                 type='number'
                 value={formData.amount || ''}
                 onChange={handleChange}
-              />
-            </FormRow>
-            <FormRow>
-              <label htmlFor="platform">Platform*</label>
-              <ExpensePlatformDropdown
-                value={formData.platform || ''}
-                onChange={(e) => handleChange(e)}
               />
             </FormRow>
             <FormRow>
@@ -217,4 +203,4 @@ const Expenses = ({ sidebarOpen }) => {
   );
 };
 
-export default Expenses;
+export default Planners;
