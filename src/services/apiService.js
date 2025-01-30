@@ -6,6 +6,15 @@ const getToken = () => {
 
 
 const apiService = {
+  getPlanners: async (page, pageLimit) => {
+    const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/planners`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+      params: { "page": page, "limit": pageLimit },
+    });
+    return response.data;
+  },
+
+
   getDailyReports: async () => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/reports/dashboard`, {
       headers: { Authorization: `Bearer ${getToken()}` },

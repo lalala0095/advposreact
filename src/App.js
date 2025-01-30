@@ -22,6 +22,8 @@ import AboutTheDev from './pages/About Us';
 import LandPage from './pages/Landpage'; // LandPage component
 import AuthProvider from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Planners from './pages/Planner';
+import EditPlannerPage from './pages/EditPlanner';
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -74,6 +76,15 @@ const App = () => {
                         element={
                           <ProtectedRoute>
                             <Expenses />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route path="/edit-planner/:plannerId" element={<EditPlannerPage />} />
+                      <Route
+                        path="/planners"
+                        element={
+                          <ProtectedRoute>
+                            <Planners />
                           </ProtectedRoute>
                         }
                       />
