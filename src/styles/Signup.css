@@ -9,7 +9,6 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #121212; /* Dark background */
   padding: 20px; /* Added padding to prevent edge to edge */
   box-sizing: border-box; /* Ensures padding is considered within container size */
 }

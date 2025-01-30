@@ -2,7 +2,7 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { FaBars, FaHome, FaChartBar, FaCog, FaSignInAlt, FaUserPlus, FaHandHoldingUsd, FaAddressCard } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 
 const SidebarWrapper = styled.div`
@@ -15,6 +15,7 @@ const SidebarWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  display: ${(props) => (props.isSidebarVisible ? 'flex' : 'none')};
 `;
 
 const SidebarHeader = styled.div`
@@ -62,12 +63,8 @@ const Sidebar = ({ onSidebarToggle }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (!isAuthenticated) {
-  //     navigate('/'); // Redirect to login if not authenticated
-  //   }
-  // }, [isAuthenticated, navigate]);
+  const location = useLocation();
+  const isSidebarVisible = location.pathname !== '/';
 
   const handleLogout = () => {
     logout(); // Call the logout function from context to clear session data
@@ -81,7 +78,7 @@ const Sidebar = ({ onSidebarToggle }) => {
 
   if (!isAuthenticated) {
     return (
-      <SidebarWrapper isSidebarOpen={isSidebarOpen}>
+      <SidebarWrapper isSidebarOpen={isSidebarOpen} isSidebarVisible={isSidebarVisible}>
         <SidebarHeader>
           <FaBars onClick={handleSidebarToggle} />
         </SidebarHeader>
@@ -98,13 +95,13 @@ const Sidebar = ({ onSidebarToggle }) => {
   }
 
   return (
-    <SidebarWrapper isSidebarOpen={isSidebarOpen}>
+    <SidebarWrapper isSidebarOpen={isSidebarOpen} isSidebarVisible={isSidebarVisible}>
       <SidebarHeader>
         <FaBars onClick={handleSidebarToggle} />
       </SidebarHeader>
-      <MenuItem to="/" isSidebarOpen={isSidebarOpen}>
+      <MenuItem to="/dashboard" isSidebarOpen={isSidebarOpen}>
         <FaHome />
-        {isSidebarOpen && 'Home'}
+        {isSidebarOpen && 'Dashboard'}
       </MenuItem>
       <MenuItem to="/billers" isSidebarOpen={isSidebarOpen}>
         <FaHandHoldingUsd />

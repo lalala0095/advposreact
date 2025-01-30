@@ -1,24 +1,10 @@
-// styles/GlobalStyles.js
-// import styled from 'styled-components';
-
-// export const AppWrapper = styled.div`
-//   display: flex;
-//   height: 100vh;
-//   background-color: ${(props) => props.theme.backgroundColor};
-//   color: ${(props) => props.theme.textColor};
-// `;
-
-// export const ContentWrapper = styled.div`
-//   flex-grow: 1;
-//   padding: 20px;
-//   overflow-y: auto;
-// `;
-
-// styles/GlobalStyles.js
-import styled from 'styled-components';
+import styled, {createGlobalStyle} from 'styled-components';
 
 export const AppWrapper = styled.div`
   display: flex;
+  background-image: url('/images/background.png');
+  background-size: cover;
+  background-position: "center";
 `;
 
 export const ContentWrapper = styled.div`
@@ -29,3 +15,14 @@ export const ContentWrapper = styled.div`
   background-color: ${(props) => props.theme.contentBackground};
 `;
 
+const GlobalStyle = createGlobalStyle`
+  html, body {
+    height: 100%;
+    margin: 0; /* Remove any default margin */
+    padding: 0; /* Remove any default padding */
+    overflow-y: auto; /* Allow vertical scrollbar when content overflows */
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
+  }
+`;
+
+export default GlobalStyle;

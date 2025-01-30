@@ -113,7 +113,7 @@ const CashFlowsPage = ({ sidebarOpen }) => {
     <PageContainer>
       <ContentContainer sidebarOpen={sidebarOpen}>
         <Header>
-          <h1>Manage CashFlows</h1>
+          <h1>Manage Cash Flows</h1>
           <AddButton onClick={() => setShowForm(!showForm)}>
             {showForm ? 'Cancel' : 'Add New CashFlow'}
           </AddButton>
@@ -122,7 +122,7 @@ const CashFlowsPage = ({ sidebarOpen }) => {
         <CashFlowsTable handleFlashMessage={handleFlashMessage} refreshKey={refreshKey} />
         {showForm && (
           <FormWrapper onSubmit={handleAddCashFlow}>
-            <h3>Add New CashFlow*</h3>
+            <h3>Add New Cash Flow*</h3>
             <FormRow>
               <Label htmlFor="date_of_transaction">Date of Transaction</Label>
               <DateInputField
