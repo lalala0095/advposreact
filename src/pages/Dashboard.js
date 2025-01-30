@@ -43,6 +43,7 @@ const Dashboard = () => {
 
   return (
     <DashboardContainer>
+      <h2>Dashboard</h2>
       {token ? (
         <div>
             <CardWrapper>

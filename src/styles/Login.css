@@ -1,7 +1,6 @@
 /* Login.css */
 
 body {
-  background-color: #252424; /* Dark background for the whole page */
   color: #e0e0e0; /* Light text for dark mode */
   font-family: 'Arial', sans-serif;
 }
@@ -11,7 +10,6 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #121212; /* Dark background */
 }
 
 .login-box {
