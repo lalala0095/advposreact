@@ -185,15 +185,8 @@ async def get_expenses(page: int = 1, limit: int = 10, token_data: dict = Depend
     for i in expenses:
         i['_id'] = str(i['_id'])
 
-    total_count = await db.expenses.count_documents({})
+    total_count = await db.expenses.count_documents({"user_id": user_id})
     total_pages = math.ceil(total_count / limit)
-
-    # Check if no expenses were found
-    if not expenses:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No expenses found"
-        )
 
     await create_custom_log(
         event= "get expenses",
