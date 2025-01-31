@@ -5,13 +5,14 @@ from app.core.config import settings
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.routes.expenses import router as expense_router
 from app.api.v1.routes.cash_flows import router as cash_flow_router
 from app.api.v1.routes.billers import router as biller_router
 from app.api.v1.routes.bills import router as bill_router
 from app.api.v1.routes.support_tickets import router as support_ticket_router
 from app.api.v1.routes.reports import router as report_router
-from fastapi.middleware.cors import CORSMiddleware
+from app.api.v1.routes.planners import router as planner_router
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/accounts/login",
                                      scopes={"read": "Read access", "write": "Write access"})
@@ -65,6 +66,7 @@ app.include_router(cash_flow_router, prefix="/api/v1/cash_flows", tags=["Cash Fl
 app.include_router(biller_router, prefix="/api/v1/billers", tags=["Biller"])
 app.include_router(report_router, prefix="/api/v1/reports", tags=["Reports"], )
 app.include_router(bill_router, prefix="/api/v1/bills", tags=["Bills"], )
+app.include_router(planner_router, prefix="/api/v1/planners", tags=["Planners"], )
 app.include_router(support_ticket_router, prefix="/api/v1/support_tickets", tags=["Support Tickets"], )
 
 app.add_middleware(
