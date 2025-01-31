@@ -4,8 +4,39 @@ const getToken = () => {
   return localStorage.getItem('token') || '';
 };
 
-
 const apiService = {
+  putPlanner: async (plannerData, plannerId) => {
+    const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/planners/${plannerId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(plannerData),
+    });
+    const result = await response.json();
+    return result;
+  },
+
+  postPlanners: async (plannerData) => {
+    const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/planners`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(plannerData),
+    });
+    return response;
+  },
+
+  getPlannersOptions: async () => {
+    const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/planners/get_options`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response.data.options;
+  },
+
   getPlanners: async (page, pageLimit) => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/planners`, {
       headers: { Authorization: `Bearer ${getToken()}` },
@@ -14,6 +45,12 @@ const apiService = {
     return response.data;
   },
 
+  getPlanner: async (plannerId) => {
+    const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/planners/get_planner/${plannerId}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    return response.data;
+  },
 
   getDailyReports: async () => {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/reports/dashboard`, {

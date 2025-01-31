@@ -13,6 +13,11 @@ export const ContentWrapper = styled.div`
   transition: margin-left 0.3s ease;
   padding: 20px;
   background-color: ${(props) => props.theme.contentBackground};
+
+  /* Ensure no forced height */
+  min-height: auto;
+  height: 100%;
+  display: block; /* Removes any flexbox-related positioning */
 `;
 
 const GlobalStyle = createGlobalStyle`
