@@ -13,8 +13,8 @@ const usePlanners = (currentPage = 1, currentPageLimit = 10, refreshKey) => {
       setLoading(true);
       try {
         const response = await apiService.getPlanners(currentPage, currentPageLimit);
-        // const { items, total_pages, limit } = response.data.total_pages;
-        const { items, total_pages, limit } = response.data;
+        // const { items, total_pages, limit } = response.total_pages;
+        const { items, total_pages, limit } = response;
         setPlanners(items);
         setTotalPages(total_pages);
         setTotalPagesLimit(limit);

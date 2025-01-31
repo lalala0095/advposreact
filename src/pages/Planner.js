@@ -2,50 +2,55 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PlannersTable from '../components/PlannersTable';
 import FlashMessage from '../components/FlashMessage'; 
-import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, Label } from '../styles/BillersStyles';
-import { PlannerPlatformDropdown, PlannerTypeDropdown } from '../components/Dropdowns';
 import apiService from '../services/apiService';
+import {
+  PageContainer, ContentContainer, Header, AddButton, Label,
+  PlannerFormWrapper, FormRow, SubmitButton
+} from '../styles/BillersStyles';
+import ViewComparison from '../components/ViewComparison';
 
 const Planners = ({ sidebarOpen }) => {
-  const [totalItems, setTotalItems] = useState([]);
-  const [totalPages, setTotalPages] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageLimit, setCurrentPageLimit] = useState(10);
   const navigate = useNavigate();
   const [flashMessage, setFlashMessage] = useState('');
-  const [showForm, setShowForm] = useState(false); 
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    date_of_transaction: '',
-    description: '',
-    planner_type: '',
-    amount: '',
-    platform: '',
-    store: '',
-    remarks: '',
-    payment_method: '',
+    planner_name: '',
+    expenses: [],
+    cash_flows: [],
   });
 
-  const refreshData = () => {
-    setRefreshKey(prevKey => prevKey + 1);
+  const [expenses, setExpenses] = useState([]);
+  const [cashFlows, setCashFlows] = useState([]);
+  const [selectedExpenses, setSelectedExpenses] = useState([]);
+  const [selectedCashFlows, setSelectedCashFlows] = useState([]);
+  const [showComparison, setShowComparison] = useState(false);
+  const [plannerData, setPlannerData] = useState(null);
+
+  // Function to toggle the visibility of comparison and fetch planner data
+  const toggleComparison = async (plannerId) => {
+    setShowComparison((prevState) => !prevState);  // Toggle visibility
+    try {
+      const result = await apiService.getPlanner(plannerId);  // Fetch planner data
+      setPlannerData(result);  // Set the planner data for comparison
+      console.log("planner data: " + result);
+    } catch (error) {
+      console.error('Error fetching planner data:', error);
+    }
   };
-  
-  const handleFlashMessage = (message) => {
-    setFlashMessage(message);
-    setTimeout(() => {
-      setFlashMessage('');
-    }, 3000);
-  };
-  
+
   useEffect(() => {
     const fetchPlanners = async () => {
       const result = await apiService.getPlanners(currentPage, currentPageLimit);
-      setTotalItems(result.data.total_items || 0);
-      setTotalPages(result.data.total_pages || 0);
-    }
-    
+      setTotalItems(result.total_items || 0);
+      setTotalPages(result.total_pages || 0);
+    };
     fetchPlanners();
-  }, [currentPage, currentPageLimit]); // Fetch data when page or page limit changes
+  }, [currentPage, currentPageLimit]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -55,63 +60,82 @@ const Planners = ({ sidebarOpen }) => {
     setCurrentPageLimit(newLimit);
   };
 
-  const handleAddPlanner = async (e) => {
-    e.preventDefault();
-    const plannerData = {
-      date_of_transaction: formData.date_of_transaction,
-      description: formData.description,
-      planner_type: formData.planner_type,
-      amount: formData.amount,
-      platform: formData.platform,
-      store: formData.store,
-      remarks: formData.remarks,
-      payment_method: formData.payment_method,
-    };
-    if (formData.store === '') {
-      delete plannerData.store;
+  const handleFlashMessage = (message) => {
+    setFlashMessage(message);
+    setTimeout(() => {
+      setFlashMessage('');
+    }, 3000);
+  };
+
+  const handleAddPlannerClick = async () => {
+    setShowForm(!showForm);
+
+    if (!showForm) {
+      try {
+        const result = await apiService.getPlannersOptions();
+        setExpenses(result.planner.expenses || []);
+        setCashFlows(result.planner.cash_flows || []);
+      } catch (error) {
+        console.error('Error fetching expenses & cash flows:', error);
+        handleFlashMessage('Error loading options.');
+      }
     }
+  };
+
+  const handleSelectExpense = (expense) => {
+    setSelectedExpenses((prevExpenses) => {
+      // If the expense is already selected, remove it
+      if (prevExpenses.some((item) => item._id === expense._id)) {
+        return prevExpenses.filter((item) => item._id !== expense._id);
+      } 
+      // Otherwise, add it
+      return [...prevExpenses, expense];
+    });
+  };
+
+  const handleSelectCashFlow = (cashFlow) => {
+    setSelectedCashFlows((prevCashFlows) => {
+      if (prevCashFlows.some((item) => item._id === cashFlow._id)) {
+        return prevCashFlows.filter((item) => item._id !== cashFlow._id);
+      }
+      return [...prevCashFlows, cashFlow];
+    });
+  };
+
+  const handleRefresh = () => {
+    setRefreshKey(prevKey => prevKey + 1);
+  }
+
+  const totalExpenses = selectedExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalCashFlows = selectedCashFlows.reduce((sum, cashFlow) => sum + cashFlow.amount, 0);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent page reload
+  
+    const plannerData = {
+      planner_name: formData.planner_name,
+      expenses: selectedExpenses,
+      cash_flows: selectedCashFlows,
+    };
   
     try {
-      const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/planners`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(plannerData),
-      });
+      const response = await apiService.postPlanners(plannerData);
       const result = await response.json();
   
       if (response.ok) {
         handleFlashMessage(result.message);
-        refreshData();
-        setTimeout(() => navigate("/planners"), 2000);
+        setFormData({ planner_name: '', expenses: [], cash_flows: [] });
+        setSelectedExpenses([]);
+        setSelectedCashFlows([]);
+        setShowForm(false);
+        handleRefresh();
       } else {
-        const errorDetail = result.response?.detail || 'Something went wrong';
-        console.error('Error:', errorDetail);
-        handleFlashMessage(`Error: ${errorDetail}`);
+        handleFlashMessage(`Error: ${result.detail || 'Failed to save planner'}`);
       }
     } catch (error) {
-      console.error('Error adding planner:', error);
-      handleFlashMessage('An error occurred while adding the planner.');
+      console.error('Error submitting planner:', error);
+      handleFlashMessage('An error occurred while saving the planner.');
     }
-  
-    setFormData({
-      date_of_transaction: '',
-      description: '',
-      planner_type: '',
-      amount: '',
-      platform: '',
-      store: '',
-      remarks: '',
-      payment_method: '',
-    });
-    setShowForm(false);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
   };
 
   return (
@@ -119,15 +143,18 @@ const Planners = ({ sidebarOpen }) => {
       <ContentContainer sidebarOpen={sidebarOpen}>
         <Header>
           <h1>Manage Planners</h1>
-          <AddButton onClick={() => setShowForm(!showForm)}>
+          <AddButton onClick={handleAddPlannerClick}>
             {showForm ? 'Cancel' : 'Add New Planner'}
           </AddButton>
         </Header>
+
         <div>
-            <Label>Total Planners: {totalItems}</Label>
-            <Label>Total Pages: {totalPages}</Label>
+          <Label>Total Planners: {totalItems}</Label>
+          <Label>Total Pages: {totalPages}</Label>
         </div>
+
         {flashMessage && <FlashMessage message={flashMessage} />}
+
         <PlannersTable 
           handleFlashMessage={handleFlashMessage}
           refreshKey={refreshKey}
@@ -135,69 +162,144 @@ const Planners = ({ sidebarOpen }) => {
           currentPageLimit={currentPageLimit}
           onPageChange={handlePageChange}
           onPageLimitChange={handlePageLimitChange}
+          toggleComparison={toggleComparison}
         />
+
         {showForm && (
-          <FormWrapper onSubmit={handleAddPlanner}>
-            <h3>Add New Planner*</h3>
+          <PlannerFormWrapper onSubmit={handleSubmit}>
+            <h3>Add New Planner</h3>
+
             <FormRow>
-              <label htmlFor="date_of_transaction">Date of Transaction*</label>
+              <label htmlFor="planner_name">Planner Name*</label>
               <input
-                type='date'
-                id="date_of_transaction"
-                name="date_of_transaction"
-                value={formData.date_of_transaction || ''}
-                onChange={handleChange}
+                id="planner_name"
+                name="planner_name"
+                value={formData.planner_name || ''}
+                onChange={(e) => setFormData({ ...formData, planner_name: e.target.value })}
               />
             </FormRow>
-            <FormRow>
-              <label htmlFor="description">Description*</label>
-              <input
-                id="description"
-                name="description"
-                value={formData.description || ''}
-                onChange={handleChange}
-              />
-            </FormRow>
-            <FormRow>
-              <label htmlFor="amount">Amount*</label>
-              <input
-                id="amount"
-                name="amount"
-                type='number'
-                value={formData.amount || ''}
-                onChange={handleChange}
-              />
-            </FormRow>
-            <FormRow>
-              <label htmlFor="store">Store</label>
-              <input
-                id="store"
-                name="store"
-                value={formData.store || ''}
-                onChange={handleChange}
-              />
-            </FormRow>   
-            <FormRow>
-              <label htmlFor="remarks">Remarks</label>
-              <textarea
-                id="remarks"
-                name="remarks"
-                value={formData.remarks || ''}
-                onChange={handleChange}
-              />
-            </FormRow>
-            <FormRow>
-              <label htmlFor="payment_method">Payment Method</label>
-              <input
-                id="payment_method"
-                name="payment_method"
-                value={formData.payment_method || ''}
-                onChange={handleChange}
-              />
-            </FormRow>            
+
+            <div style={{ display: 'flex', gap: '20px' }}>
+              {/* Left Side: Expenses and Cash Flows */}
+              <div style={{ flex: 1 }}>
+                {/* Expenses Table */}
+                <h4>Expenses</h4>
+                <table border="1" width="100%">
+                  <thead>
+                    <tr>
+                      <th>Select</th>
+                      <th>Description</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {expenses.map((expense, index) => (
+                      <tr key={index}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedExpenses.some((item) => item._id === expense._id)}
+                            onChange={() => handleSelectExpense(expense)}
+                          />
+                        </td>
+                        <td>{expense.expense_label}</td>
+                        <td>{expense.amount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Cash Flows Table */}
+                <h4>Cash Flows</h4>
+                <table border="1" width="100%">
+                  <thead>
+                    <tr>
+                      <th>Select</th>
+                      <th>Name</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cashFlows.map((cashFlow, index) => (
+                      <tr key={index}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedCashFlows.some((item) => item._id === cashFlow._id)}
+                            onChange={() => handleSelectCashFlow(cashFlow)}
+                          />
+                        </td>
+                        <td>{cashFlow.cash_flow_label}</td>
+                        <td>{cashFlow.amount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Right Side: Selected Expenses and Cash Flows */}
+              <div style={{ flex: 1 }}>
+                <h4>Selected Expenses</h4>
+                <table border="1" width="100%">
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedExpenses.map((expense, index) => (
+                      <tr key={expense._id}>
+                        <td>{expense.expense_label}</td>
+                        <td>{expense.amount}</td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td><strong>Total Expenses</strong></td>
+                      <td><strong>{totalExpenses.toFixed(2)}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h4>Selected Cash Flows</h4>
+                <table border="1" width="100%">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedCashFlows.map((cashFlow, index) => (
+                      <tr key={cashFlow._id}>
+                        <td>{cashFlow.cash_flow_label}</td>
+                        <td>{cashFlow.amount}</td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td><strong>Total Cash Flows</strong></td>
+                      <td><strong>{totalCashFlows.toFixed(2)}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             <SubmitButton type="submit">Save</SubmitButton>
-          </FormWrapper>
+          </PlannerFormWrapper>
         )}
+
+        <div>
+              {/* Display the comparison section if visible */}
+              {showComparison && plannerData && (
+                <div style={{ marginTop: '20px' }}>
+                  <h3>Comparison for Planner: {plannerData.planner_name}</h3>
+                  <ViewComparison plannerData={plannerData} />  {/* Show comparison data */}
+                </div>
+              )}
+
+        </div>
+
       </ContentContainer>
     </PageContainer>
   );

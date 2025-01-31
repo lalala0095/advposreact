@@ -1,6 +1,14 @@
 // BillersStyles.js
 import styled from 'styled-components';
 
+export const ViewComparisonButton = styled.button`
+  background: none;
+  border: none;
+  color: blue;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
 export const FormWrapper = styled.form`
 margin-top: 20px;
 margin-left: 20px;
@@ -10,6 +18,17 @@ border: 1px solid #ccc;
 border-radius: 8px;
 color: #fff;
 max-width: 420px;
+`;
+
+export const PlannerFormWrapper = styled.form`
+margin-top: 20px;
+margin-left: 20px;
+padding: 20px;
+background-color: #333131;
+border: 1px solid #ccc;
+border-radius: 8px;
+color: #fff;
+max-width: 80%;
 `;
 
 export const FormRow = styled.div`
