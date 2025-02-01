@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import apiService from '../services/apiService'; // Centralized API service
 
-const useCashFlows = (currentPage = 1, refreshKey) => {
+const useCashFlows = (currentPage = 1, currentPageLimit = 10, refreshKey) => {
   const [cash_flows, setCashFlows] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalPageLimit, setTotalPagesLimit] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -11,10 +12,11 @@ const useCashFlows = (currentPage = 1, refreshKey) => {
     const fetchCashFlows = async () => {
       setLoading(true);
       try {
-        const response = await apiService.getCashFlows(currentPage);
-        const { items, total_pages } = response.data;
+        const response = await apiService.getCashFlows(currentPage, currentPageLimit);
+        const { items, total_pages, limit } = response.data;
         setCashFlows(items);
         setTotalPages(total_pages);
+        setTotalPagesLimit(limit);
         setError(null);
       } catch (err) {
         console.error(err);
@@ -24,9 +26,9 @@ const useCashFlows = (currentPage = 1, refreshKey) => {
       }
     };
     fetchCashFlows();
-  }, [currentPage, refreshKey]);
+  }, [currentPage, currentPageLimit, refreshKey]);
 
-  return { cash_flows, totalPages, loading, error };
+  return { cash_flows, totalPages, totalPageLimit, loading, error };
 };
 
 export default useCashFlows;

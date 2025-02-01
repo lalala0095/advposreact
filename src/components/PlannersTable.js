@@ -17,34 +17,22 @@ import PaginationControl from './PaginationControl';
 import ViewComparison from './ViewComparison'; // The component to show the comparison
 
 const PlannersTable = ({ 
-  refreshKey, 
+  refreshKey,
+  setRefreshKey,
   handleFlashMessage, 
+  handleDelete,
   currentPage, 
   currentPageLimit, 
   onPageChange, 
   onPageLimitChange 
 }) => {
   const navigate = useNavigate();
+
   const { planners, totalPages, loading, error } = usePlanners(currentPage, currentPageLimit, refreshKey);
   
   const [selectedPlannerId, setSelectedPlannerId] = useState(null); // Track the selected planner for comparison
   const [plannerData, setPlannerData] = useState(null); // Store the planner data for comparison
-
-  const handleDelete = async (plannerId) => {
-    const response = await apiService.deletePlanner(plannerId);
-    try {
-      setTimeout(() => {
-        handleFlashMessage(response.data.message + " Refreshing the page.");
-        navigate('/cash_flows');
-      }, 1000);
-    } catch (error) {
-      setTimeout(() => {
-        console.error(error);
-        handleFlashMessage(response.detail + " Refreshing the page.");
-      }, 1000);
-    }
-  };
-
+  
   const handleEdit = (plannerId) => navigate(`/edit-planner/${plannerId}`);
 
   const handleViewComparison = async (plannerId) => {
@@ -78,7 +66,8 @@ const PlannersTable = ({
             </tr>
           </thead>
           <tbody>
-            {planners.map((planner) => (
+          {(planners || []).map((planner) => (
+            // {planners.map((planner) => (
               <TableRow key={planner._id}>
                 <TableData>{planner.date_added}</TableData>
                 <TableData>{planner.planner_name}</TableData>

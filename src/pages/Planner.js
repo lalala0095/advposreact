@@ -73,8 +73,8 @@ const Planners = ({ sidebarOpen }) => {
     if (!showForm) {
       try {
         const result = await apiService.getPlannersOptions();
-        setExpenses(result.planner.expenses || []);
-        setCashFlows(result.planner.cash_flows || []);
+        setExpenses(result.data.options.expenses || []);
+        setCashFlows(result.data.options.cash_flows || []);
       } catch (error) {
         console.error('Error fetching expenses & cash flows:', error);
         handleFlashMessage('Error loading options.');
@@ -138,6 +138,18 @@ const Planners = ({ sidebarOpen }) => {
     }
   };
 
+  const handleDelete = async (plannerId) => {
+    const response = await apiService.deletePlanner(plannerId);
+    try {
+      handleFlashMessage(response.data.message + " Refreshing the page.");
+      const updatedPlanners = await apiService.getPlanners(currentPage, currentPageLimit);
+      setRefreshKey(prevKey => prevKey + 1);
+    } catch (error) {
+      console.error(error);
+      handleFlashMessage(response.detail + " Refreshing the page.");
+    }
+  };
+
   return (
     <PageContainer>
       <ContentContainer sidebarOpen={sidebarOpen}>
@@ -158,6 +170,8 @@ const Planners = ({ sidebarOpen }) => {
         <PlannersTable 
           handleFlashMessage={handleFlashMessage}
           refreshKey={refreshKey}
+          setRefreshKey={setRefreshKey}
+          handleDelete={handleDelete}
           currentPage={currentPage}
           currentPageLimit={currentPageLimit}
           onPageChange={handlePageChange}
@@ -193,7 +207,8 @@ const Planners = ({ sidebarOpen }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {expenses.map((expense, index) => (
+                  {(expenses || []).map((expense, index) => (
+                    // {expenses.map((expense, index) => (
                       <tr key={index}>
                         <td>
                           <input
@@ -220,7 +235,8 @@ const Planners = ({ sidebarOpen }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {cashFlows.map((cashFlow, index) => (
+                  {(cashFlows || []).map((cashFlow, index) => (
+                    // {cashFlows.map((cashFlow, index) => (
                       <tr key={index}>
                         <td>
                           <input
