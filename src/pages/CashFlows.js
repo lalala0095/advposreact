@@ -5,12 +5,17 @@ import CashFlowsTable from '../components/CashFlowsTable';
 import FlashMessage from '../components/FlashMessage'; // Import the new FlashMessage component
 import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, InputField, Label, TextArea, DateInputField } from '../styles/BillersStyles'
 import { CashFlowTypeDropdown } from '../components/Dropdowns';
+import apiService from '../services/apiService';
 
 const CashFlowsPage = ({ sidebarOpen }) => {
+  const [totalItems, setTotalItems] = useState([]);
+  const [totalPages, setTotalPages] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPageLimit, setCurrentPageLimit] = useState(10);
   const navigate = useNavigate();
   const [flashMessage, setFlashMessage] = useState('');
-  const [showForm, setShowForm] = useState(false); // State to toggle the form visibility
+  const [showForm, setShowForm] = useState(false); 
   const [formData, setFormData] = useState({
     date_of_transaction: '',
     cash_flow_name: '',
@@ -104,9 +109,28 @@ const CashFlowsPage = ({ sidebarOpen }) => {
     setShowForm(false); // Hide the form after submission
   };
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handlePageLimitChange = (newLimit) => {
+    setCurrentPageLimit(newLimit);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleDelete = async (cash_flowId) => {
+    const response = await apiService.deleteCashFlow(cash_flowId);
+    try {
+        handleFlashMessage(response.data.message + " Refreshing the page.");
+        setRefreshKey(prevKey => prevKey + 1);
+    } catch (error) {
+      console.error(error);
+      handleFlashMessage(response.detail + " Refreshing the page.");
+    }
   };
 
   return (
@@ -119,7 +143,16 @@ const CashFlowsPage = ({ sidebarOpen }) => {
           </AddButton>
         </Header>
         {flashMessage && <FlashMessage message={flashMessage} />} {/* Use the FlashMessage component here */}
-        <CashFlowsTable handleFlashMessage={handleFlashMessage} refreshKey={refreshKey} />
+        <CashFlowsTable 
+          handleFlashMessage={handleFlashMessage}
+          refreshKey={refreshKey}
+          setRefreshKey={setRefreshKey}
+          handleDelete={handleDelete}
+          currentPage={currentPage}
+          currentPageLimit={currentPageLimit}
+          onPageChange={handlePageChange}
+          onPageLimitChange={handlePageLimitChange}        
+        />
         {showForm && (
           <FormWrapper onSubmit={handleAddCashFlow}>
             <h3>Add New Cash Flow*</h3>

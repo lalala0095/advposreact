@@ -5,6 +5,12 @@ const getToken = () => {
 };
 
 const apiService = {
+  deletePlanner: async (id) => {
+    return axios.delete(`${process.env.REACT_APP_FASTAPI_URL}/planners/${id}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+  },
+
   putPlanner: async (plannerData, plannerId) => {
     const response = await fetch(`${process.env.REACT_APP_FASTAPI_URL}/planners/${plannerId}`, {
       method: 'PUT',
@@ -34,7 +40,7 @@ const apiService = {
     const response = await axios.get(`${process.env.REACT_APP_FASTAPI_URL}/planners/get_options`, {
       headers: { Authorization: `Bearer ${getToken()}` },
     });
-    return response.data.options;
+    return response;
   },
 
   getPlanners: async (page, pageLimit) => {
@@ -88,6 +94,12 @@ const apiService = {
       params: { "page": page, "limit": pageLimit },
     });
     return response.data;
+  },
+
+  deleteExpense: async (id) => {
+    return axios.delete(`${process.env.REACT_APP_FASTAPI_URL}/expenses/${id}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
   },
 
   getSubscriptionOptions: async () => {

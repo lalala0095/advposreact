@@ -114,6 +114,17 @@ const Expenses = ({ sidebarOpen }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleDelete = async (expenseId) => {
+    const response = await apiService.deleteExpense(expenseId);
+    try {
+        handleFlashMessage(response.data.message + " Refreshing the page.");
+        setRefreshKey(prevKey => prevKey + 1);
+    } catch (error) {
+      console.error(error);
+      handleFlashMessage(response.detail + " Refreshing the page.");
+    }
+  };
+
   return (
     <PageContainer>
       <ContentContainer sidebarOpen={sidebarOpen}>
@@ -131,6 +142,8 @@ const Expenses = ({ sidebarOpen }) => {
         <ExpensesTable 
           handleFlashMessage={handleFlashMessage}
           refreshKey={refreshKey}
+          setRefreshKey={setRefreshKey}
+          handleDelete={handleDelete}
           currentPage={currentPage}
           currentPageLimit={currentPageLimit}
           onPageChange={handlePageChange}

@@ -14,37 +14,17 @@ import {
 import apiService from '../services/apiService';
 import PaginationControl from './PaginationControl';
 
-const ExpensesTable = ({ refreshKey, handleFlashMessage, currentPage, currentPageLimit, onPageChange, onPageLimitChange }) => {
+const ExpensesTable = ({ 
+  refreshKey,
+  setRefreshKey,
+  handleFlashMessage,
+  handleDelete, 
+  currentPage, 
+  currentPageLimit, 
+  onPageChange, 
+  onPageLimitChange }) => {
   const navigate = useNavigate();
   const { expenses, totalPages, loading, error } = useExpenses(currentPage, currentPageLimit, refreshKey);
-  // const [currentPage, setCurrentPage] = React.useState(1);
-  // const [currentPageLimit, setCurrentPageLimit] = React.useState(10);
-  
-  // const forceUpdate = () => {
-  //   setCurrentPage(1)
-  // };
-
-  // const handlePageChange = (newPage) => setCurrentPage(newPage);
-
-  // const handlePageLimitChange = (newPageLimit) => setCurrentPageLimit(newPageLimit);
-
-  const handleDelete = async (expenseId) => {
-    const response = await apiService.deleteExpense(expenseId);
-    try {
-      setTimeout(() => {
-        // forceUpdate();
-        handleFlashMessage(response.data.message + " Refreshing the page.");
-        navigate('/cash_flows');
-      }, 1000);
-    } catch (error) {
-      setTimeout(() => {
-        // forceUpdate();
-        console.error(error);
-        handleFlashMessage(response.detail + " Refreshing the page.");
-        // navigate('/cash_flows');  
-      }, 1000);
-    }
-  };
 
   const handleEdit = (expenseId) => navigate(`/edit-expense/${expenseId}`);
 

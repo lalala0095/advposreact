@@ -14,22 +14,18 @@ import {
 import PaginationControl from './PaginationControl';
 import apiService from '../services/apiService'; // Centralized API service
 
-const CashFlowsTable = ({ refreshKey, handleFlashMessage }) => {
-  const [currentPage, setCurrentPage] = React.useState(1);
+const CashFlowsTable = ({ 
+  refreshKey,
+  setRefreshKey,
+  handleFlashMessage, 
+  handleDelete,
+  currentPage, 
+  currentPageLimit, 
+  onPageChange, 
+  onPageLimitChange,
+ }) => {
   const navigate = useNavigate();
-  const { cash_flows, totalPages, loading, error } = useCashFlows(currentPage, refreshKey);
-
-  const handlePageChange = (newPage) => setCurrentPage(newPage);
-
-  const handleDelete = async (cash_flowId) => {
-    try {
-      await apiService.deleteCashFlow(cash_flowId);
-      handleFlashMessage('CashFlow deleted successfully.');
-    } catch (error) {
-      console.error(error);
-      handleFlashMessage('Failed to delete cash_flow.');
-    }
-  };
+  const { cash_flows, totalPages, loading, error } = useCashFlows(currentPage, currentPageLimit, refreshKey);
 
   const handleEdit = async (cash_flowId) => {
     console.log("editing for " + cash_flowId);
@@ -84,7 +80,9 @@ const CashFlowsTable = ({ refreshKey, handleFlashMessage }) => {
       <PaginationControl
         currentPage={currentPage}
         totalPages={totalPages}
-        handlePageChange={handlePageChange}
+        handlePageChange={onPageChange}
+        currentPageLimit={currentPageLimit}
+        handlePageLimitChange={onPageLimitChange}
       />
     </TableWrapper>
   );
