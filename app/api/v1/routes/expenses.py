@@ -113,7 +113,8 @@ async def delete_expense(expense_id: str, token_data: dict = Depends(verify_toke
     await create_custom_log(
         event= "delete expense",
         user_id = user_id,
-        old_doc=old_doc
+        old_doc=old_doc,
+        objectid=expense_id
     )
 
     # Check if the document was deleted

@@ -133,9 +133,7 @@ async def delete_planner(planner_id: str, token_data: dict = Depends(verify_toke
             detail="Planner not found"
         )
 
-    return {"data": {
-        "message": "Planner deleted successfully"
-    }}
+    return {"message": "Planner deleted successfully"}
 
 @router.get("/", response_model=Dict[str, object])
 async def get_planners(page: int = 1, limit: int = 10, token_data: dict = Depends(verify_token)):

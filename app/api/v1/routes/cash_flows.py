@@ -115,9 +115,7 @@ async def delete_cash_flow(cash_flow_id: str, token_data: dict = Depends(verify_
             detail="Cash Flow not found"
         )
 
-    return {"data": {
-        "message": "Cash Flow deleted successfully"
-    }}
+    return {"message": "Cash Flow deleted successfully"}
 
 @router.get("/", response_model=Dict[str, object])
 async def get_cash_flows(page: int = 1, limit: int = 10, token_data: dict = Depends(verify_token)):
