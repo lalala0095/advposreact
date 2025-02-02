@@ -248,7 +248,10 @@ async def get_options(token_data: dict = Depends(verify_token)):
     new_expenses = []
     for i in expenses:
         i['expense_label'] = f"{i['description']} on {i['date_of_transaction']}"
-        i['date_synched'] = pd.to_datetime(i['date_synched']).strftime("%Y-%m-%d")
+        try:
+            i['date_synched'] = pd.to_datetime(i['date_synched']).strftime("%Y-%m-%d")
+        except KeyError as e:
+            print(e)
         i['date_added'] = pd.to_datetime(i['date_added']).strftime("%Y-%m-%d")
         i['date_of_transaction'] = pd.to_datetime(i['date_of_transaction']).strftime("%Y-%m-%d")
         try:
@@ -264,7 +267,10 @@ async def get_options(token_data: dict = Depends(verify_token)):
         i['cash_flow_label'] = f"{i['cash_flow_name']} on {pd.to_datetime(i['date_of_transaction']).strftime("%m-%d-%Y")}"
         i['_id'] = str(i['_id'])
         i['date_of_transaction'] = pd.to_datetime(i['date_of_transaction']).strftime("%Y-%m-%d")
-        i['date_synched'] = pd.to_datetime(i['date_synched']).strftime("%Y-%m-%d")
+        try:
+            i['date_synched'] = pd.to_datetime(i['date_synched']).strftime("%Y-%m-%d")
+        except KeyError as e:
+            print(e)
         i['date_added'] = pd.to_datetime(i['date_added']).strftime("%Y-%m-%d")
         try:
             del i['date_updated']
