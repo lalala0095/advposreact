@@ -158,19 +158,19 @@ const EditExpensePage = () => {
               />
             </FormRow>
             <FormRow>
-              <Label htmlFor="remarks">Remarks</Label>
-              <TextArea
-                name="remarks"
-                value={formData.remarks || ""}
-                onChange={handleChange}
-              />
-            </FormRow>
-            <FormRow>
               <Label htmlFor="payment_method">Payment Method</Label>
               <input
                 id="payment_method"
                 name="payment_method"
                 value={formData.payment_method}
+                onChange={handleChange}
+              />
+            </FormRow>
+            <FormRow>
+              <Label htmlFor="remarks">Remarks</Label>
+              <TextArea
+                name="remarks"
+                value={formData.remarks || ""}
                 onChange={handleChange}
               />
             </FormRow>

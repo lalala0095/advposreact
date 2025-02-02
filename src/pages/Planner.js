@@ -31,6 +31,11 @@ const Planners = ({ sidebarOpen }) => {
   const [showComparison, setShowComparison] = useState(false);
   const [plannerData, setPlannerData] = useState(null);
 
+  const [difference, setDifference] = useState(0);
+  const [whichIsHigher, setWhichIsHigher] = useState('None');
+  const totalExpenses = selectedExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalCashFlows = selectedCashFlows.reduce((sum, cashFlow) => sum + cashFlow.amount, 0);
+
   // Function to toggle the visibility of comparison and fetch planner data
   const toggleComparison = async (plannerId) => {
     setShowComparison((prevState) => !prevState);  // Toggle visibility
@@ -82,6 +87,19 @@ const Planners = ({ sidebarOpen }) => {
     }
   };
 
+  const handleDifference = () => {
+    if (totalExpenses > totalCashFlows) {
+      setWhichIsHigher('Expenses');
+      setDifference((totalExpenses - totalCashFlows).toFixed(2));
+    } else if (totalCashFlows > totalExpenses) {
+      setWhichIsHigher('Cash Flows')
+      setDifference((totalCashFlows - totalExpenses).toFixed(2));
+    } else if (totalCashFlows === totalExpenses) {
+      setWhichIsHigher('Equal')
+      setDifference(0);
+    }
+  };
+
   const handleSelectExpense = (expense) => {
     setSelectedExpenses((prevExpenses) => {
       // If the expense is already selected, remove it
@@ -91,6 +109,14 @@ const Planners = ({ sidebarOpen }) => {
       // Otherwise, add it
       return [...prevExpenses, expense];
     });
+    handleDifference();
+
+    // Calculate the total expenses dynamically based on selected expenses
+    const newTotalExpenses = selectedExpenses.reduce((total, expense) => total + expense.amount, 0);
+    setTotalExpenses(newTotalExpenses); // Update total expenses state
+    
+    // After updating the total expenses, call handleDifference
+    handleDifference();
   };
 
   const handleSelectCashFlow = (cashFlow) => {
@@ -100,14 +126,12 @@ const Planners = ({ sidebarOpen }) => {
       }
       return [...prevCashFlows, cashFlow];
     });
+    handleDifference();
   };
 
   const handleRefresh = () => {
     setRefreshKey(prevKey => prevKey + 1);
   }
-
-  const totalExpenses = selectedExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const totalCashFlows = selectedCashFlows.reduce((sum, cashFlow) => sum + cashFlow.amount, 0);
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload
@@ -192,6 +216,26 @@ const Planners = ({ sidebarOpen }) => {
                 onChange={(e) => setFormData({ ...formData, planner_name: e.target.value })}
               />
             </FormRow>
+
+            <h4>Summary</h4>
+                <table border="1" width="100%">
+                  <thead>
+                    <tr>
+                    <th>Total Expenses</th>
+                    <th>Total Cash Flows</th>
+                    <th>Which is Higher?</th>
+                    <th>Difference</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                        <td>{ totalExpenses }</td>
+                        <td>{ totalCashFlows }</td>
+                        <td>{ whichIsHigher }</td>
+                        <td>{ difference }</td>
+                      </tr>
+                  </tbody>
+                </table>
 
             <div style={{ display: 'flex', gap: '20px' }}>
               {/* Left Side: Expenses and Cash Flows */}
