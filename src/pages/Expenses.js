@@ -203,15 +203,6 @@ const Expenses = ({ sidebarOpen }) => {
                 value={formData.store || ''}
                 onChange={handleChange}
               />
-            </FormRow>   
-            <FormRow>
-              <label htmlFor="remarks">Remarks</label>
-              <textarea
-                id="remarks"
-                name="remarks"
-                value={formData.remarks || ''}
-                onChange={handleChange}
-              />
             </FormRow>
             <FormRow>
               <label htmlFor="payment_method">Payment Method</label>
@@ -221,7 +212,16 @@ const Expenses = ({ sidebarOpen }) => {
                 value={formData.payment_method || ''}
                 onChange={handleChange}
               />
-            </FormRow>            
+            </FormRow>
+            <FormRow>
+              <label htmlFor="remarks">Remarks</label>
+              <textarea
+                id="remarks"
+                name="remarks"
+                value={formData.remarks || ''}
+                onChange={handleChange}
+              />
+            </FormRow>
             <SubmitButton type="submit">Save</SubmitButton>
           </FormWrapper>
         )}
