@@ -8,7 +8,7 @@ export const ComparisonWrapper = styled.div`
   border-radius: 8px;
   background-color: #333131;
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
-  width: 50%;
+  width: 80%;
   color: #fff;
 `;
 
@@ -18,10 +18,16 @@ export const ComparisonHeader = styled.h3`
   margin-bottom: 15px;
 `;
 
+export const ComparisonSubHeader = styled.h3`
+  font-size: 18px;
+  color: #fff;
+  margin-bottom: 15px;
+`;
+
 export const ComparisonTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 20px;
   background: #222;
 `;
 
@@ -37,6 +43,18 @@ export const TableData = styled.td`
   padding: 10px;
   border: 1px solid #555;
   color: #ddd;
+`;
+
+export const CashFlowTableData = styled.td`
+  padding: 10px;
+  border: 1px solid #555;
+  color: green;
+`;
+
+export const ExpenseTableData = styled.td`
+  padding: 10px;
+  border: 1px solid #555;
+  color: red;
 `;
 
 export const TableRow = styled.tr`

@@ -62,6 +62,10 @@ const PlannersTable = ({
               <TableHeader>Planner Name</TableHeader>
               <TableHeader>Expenses</TableHeader>
               <TableHeader>Cash Flows</TableHeader>
+              <TableHeader>Total Expenses</TableHeader>
+              <TableHeader>Total Cash Flows</TableHeader>
+              <TableHeader>Which is Higher</TableHeader>
+              <TableHeader>Difference</TableHeader>
               <TableHeader>Actions</TableHeader>
             </tr>
           </thead>
@@ -73,6 +77,10 @@ const PlannersTable = ({
                 <TableData>{planner.planner_name}</TableData>
                 <TableData>{planner.expenses}</TableData>
                 <TableData>{planner.cash_flows}</TableData>
+                <TableData>{planner.total_expenses}</TableData>
+                <TableData>{planner.total_expenses_cash_flows}</TableData>
+                <TableData>{planner.which_is_higher}</TableData>
+                <TableData>{planner.difference}</TableData>
                 <TableData>
                   <EditButton title='Edit' onClick={() => handleEdit(planner._id)}>
                     <FaPenSquare />
@@ -82,6 +90,7 @@ const PlannersTable = ({
                   </DeleteButton>
                   <ViewComparisonButton title='View Comparison' onClick={() => handleViewComparison(planner._id)}>
                     <FaEye />
+                      <span> View Data</span>
                   </ViewComparisonButton>
                 </TableData>
               </TableRow>

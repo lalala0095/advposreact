@@ -4,7 +4,7 @@ import styled from 'styled-components';
 export const ViewComparisonButton = styled.button`
   background: none;
   border: none;
-  color: blue;
+  color: yellow;
   cursor: pointer;
   font-size: 16px;
 `;

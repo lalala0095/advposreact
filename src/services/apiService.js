@@ -5,6 +5,36 @@ const getToken = () => {
 };
 
 const apiService = {
+  exportPlannerPDF: async (id) => {
+    try {
+      const response = axios.get(`${process.env.REACT_APP_FASTAPI_URL}/planners/export_pdf/${id}`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+        responseType: 'blob',
+      });
+      return response;
+    } catch (error) {
+      console.error("Error exporting planner PDF:", error);
+      throw error;
+    }
+  },
+
+  exportPlanner: async (id) => {
+    try {
+      const response = axios.get(`${process.env.REACT_APP_FASTAPI_URL}/planners/export_csv/${id}`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+        responseType: 'blob',
+      });
+      return response;
+    } catch (error) {
+      console.error("Error exporting planner CSV:", error);
+      throw error;
+    }
+  },
+
   deletePlanner: async (id) => {
     return axios.delete(`${process.env.REACT_APP_FASTAPI_URL}/planners/${id}`, {
       headers: { Authorization: `Bearer ${getToken()}` },
