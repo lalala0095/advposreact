@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi.responses import StreamingResponse
 from app.core.database import db
 from passlib.context import CryptContext
 from app.models.planners import Planners
@@ -14,6 +15,12 @@ import math
 from app.core.database import redis_client
 import json
 import locale
+import io
+import csv
+# from starlette.responses import StreamingResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -24,21 +31,23 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 async def create_planner(planner: Planners, token_data: dict = Depends(verify_token)):
     user_id = token_data['account_id']
 
-    df = pd.DataFrame(planner.expenses)
-    total_expenses = df['amount'].sum()
+    # # df = pd.DataFrame(planner.expenses)
+    # total_expenses = planner.total_expenses
 
-    # cash_flows = [cash_flow.model_dump() for cash_flow in planner.cash_flows]
-    df = pd.DataFrame(planner.cash_flows)
-    total_cash_flows = df['amount'].sum()
+    # # cash_flows = [cash_flow.model_dump() for cash_flow in planner.cash_flows]
+    # # df = pd.DataFrame(planner.cash_flows)
+    # total_cash_flows = planner.total_cash_flows
     
     planner_data = {
         "date_added": datetime.now(),
         "user_id": user_id,
         "planner_name": planner.planner_name,
+        "which_is_higher": planner.which_is_higher,
+        "difference": planner.difference,
         "expenses": planner.expenses,
         "cash_flows": planner.cash_flows,
-        "total_expenses": float(total_expenses),
-        "total_cash_flows": float(total_cash_flows)
+        "total_expenses": float(planner.total_expenses),
+        "total_cash_flows": float(planner.total_cash_flows)
     }
     result = await db.planners.insert_one(planner_data)
     object_id = str(result.inserted_id)
@@ -290,4 +299,127 @@ async def get_options(token_data: dict = Depends(verify_token)):
     redis_client.set('planners_options', json.dumps(options), ex=0)
     
     return options
-    
+
+@router.get("/export_csv/{planner_id}")
+async def get_export_csv(planner_id: str, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+
+    # Fetch planner data
+    planner_data = await db.planners.find_one({"_id": ObjectId(planner_id)}, {"expenses.expense_label": 0, "expenses._id": 0, "cash_flows.cash_flow_label": 0, "_id": 0})
+
+    if not planner_data:
+        return {"error": "Planner not found"}
+
+    # Process expenses
+    df_expenses = pd.DataFrame(planner_data.get("expenses", []))
+    if not df_expenses.empty:
+        df_expenses.drop(columns=["_id"], errors="ignore", inplace=True)
+
+    # Process cash flows
+    df_cash_flows = pd.DataFrame(planner_data.get("cash_flows", []))
+    if not df_cash_flows.empty:
+        df_cash_flows.drop(columns=["_id"], errors="ignore", inplace=True)
+
+    # Process summary (excluding expenses and cash flows)
+    summary_data = {k: v for k, v in planner_data.items() if k not in ["expenses", "cash_flows", "_id"]}
+    df_summary = pd.DataFrame([summary_data])
+
+    # Prepare an in-memory buffer
+    output = io.StringIO()
+
+    # Write Expenses
+    if not df_expenses.empty:
+        output.write("Expenses\n")  # Section header
+        df_expenses.to_csv(output, index=False)
+        output.write("\n\n")  # Add two blank rows
+
+    # Write Cash Flows
+    if not df_cash_flows.empty:
+        output.write("Cash Flows\n")  # Section header
+        df_cash_flows.to_csv(output, index=False)
+        output.write("\n\n")  # Add two blank rows
+
+    # Write Summary
+    output.write("Summary\n")  # Section header
+    df_summary.to_csv(output, index=False)
+
+    # Move pointer to start
+    output.seek(0)
+
+    # Return as CSV file
+    return StreamingResponse(
+        output, media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=comparison_data.csv"}
+    )
+
+@router.get("/export_pdf/{planner_id}")
+async def get_export_pdf(planner_id: str, token_data: dict = Depends(verify_token)):
+    user_id = token_data['account_id']
+
+    # Fetch planner data
+    planner_data = await db.planners.find_one({"_id": ObjectId(planner_id)})
+
+    if not planner_data:
+        return {"error": "Planner not found"}
+
+    # Create in-memory buffer for PDF
+    pdf_buffer = io.BytesIO()
+    pdf = canvas.Canvas(pdf_buffer, pagesize=letter)
+    width, height = letter
+
+    y_position = height - 50  # Starting position for writing text
+
+    # Function to add section headers
+    def add_section_header(title):
+        nonlocal y_position
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.drawString(50, y_position, title)
+        y_position -= 20  # Move cursor down
+
+    # Function to add table rows
+    def add_table_row(columns):
+        nonlocal y_position
+        pdf.setFont("Helvetica", 12)
+        pdf.drawString(50, y_position, columns)
+        y_position -= 15  # Move cursor down
+
+    # Title
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(50, y_position, f"Planner Report: {planner_data.get('planner_name', 'N/A')}")
+    y_position -= 30  # Move cursor down
+
+    # Expenses Section
+    if "expenses" in planner_data and planner_data["expenses"]:
+        add_section_header("Expenses")
+        add_table_row("Description      Amount")
+        for expense in planner_data["expenses"]:
+            add_table_row(f"{expense.get('description', 'N/A')}      {expense.get('amount', 0)}")
+        y_position -= 20  # Extra space after section
+
+    # Cash Flows Section
+    if "cash_flows" in planner_data and planner_data["cash_flows"]:
+        add_section_header("Cash Flows")
+        add_table_row("Name      Amount")
+        for cash_flow in planner_data["cash_flows"]:
+            add_table_row(f"{cash_flow.get('cash_flow_name', 'N/A')}      {cash_flow.get('amount', 0)}")
+        y_position -= 20  # Extra space after section
+
+    # Summary Section
+    add_section_header("Summary")
+    add_table_row(f"Which is Higher: {planner_data.get('which_is_higher', 'N/A')}")
+    add_table_row(f"Difference: {planner_data.get('difference', 0)}")
+    add_table_row(f"Total Expenses: {planner_data.get('total_expenses', 0)}")
+    add_table_row(f"Total Cash Flows: {planner_data.get('total_cash_flows', 0)}")
+
+    # Save and finalize the PDF
+    pdf.showPage()
+    pdf.save()
+
+    pdf_buffer.seek(0)  # Reset buffer position
+
+    # Return as a downloadable PDF
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=comparison_data.pdf"},
+    )

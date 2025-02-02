@@ -1,0 +1,10 @@
+date_added,user_id,date_of_transaction,description,amount,expense_type,platform,store,remarks,payment_method,expense_label,cash_flow_name,cash_flow_type,cash_flow_label,_id,planner_name,which_is_higher,difference,total_expenses,total_cash_flows
+2025-02-02,6766b5d9c1904f6f9688bfca,2025-02-02,Baking Ingredients,36807.69,Need,Shopee,Puregold Marilao,,Bank,Baking Ingredients on 2025-02-02,,,,,,,,,
+2025-02-02,6766b5d9c1904f6f9688bfca,2025-02-02,Aluminum Foil Tray,10000.0,Need,Tiktok,Shopee - K BOX,,Metrobank,Aluminum Foil Tray on 2025-02-02,,,,,,,,,
+2025-02-02,6766b5d9c1904f6f9688bfca,2025-02-02,Baking Ingredients,100.0,Need,Shopee,Shopee - K BOX,,Cash edit,Baking Ingredients on 2025-02-02,,,,,,,,,
+2025-02-02,6766b5d9c1904f6f9688bfca,2025-02-02,,36807.69,,Cloudstaff,,,Cash,,Cloudstaff Salary,Salary,Cloudstaff Salary on 02-02-2025,,,,,,
+2025-02-02,6766b5d9c1904f6f9688bfca,2025-02-02,,7443.05,,Cash,,,Metrobank,, 13th Month Final,Business Income, 13th Month Final on 02-02-2025,,,,,,
+,,,,,,,,,,,,,,,,,,,
+2025-02-02 16:51:46.551000,6766b5d9c1904f6f9688bfca,,,,,,,,,,,,,679f3222347326c02410878b,Feb. 1st Cutoff,Expenses,2656.95,46907.69,44250.74
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,

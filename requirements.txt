@@ -17,3 +17,4 @@ pyjwt==1.7.1
 aioredis
 boto3
 argon2_cffi
+reportlab
