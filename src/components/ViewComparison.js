@@ -6,40 +6,61 @@ import {
   TableHeader,
   TableData,
   TableRow,
-  TotalRow
-} from '../styles/ViewComparisonStyles'; // Import the styles
+  TotalRow,
+  ComparisonSubHeader,
+  ExpenseTableData,
+  CashFlowTableData
+} from '../styles/ViewComparisonStyles';
+import ExportCSVButton from './ExportCSVButton';
+import ExportPDFButton from './ExportPDFButton';
 
 const ViewComparison = ({ plannerData }) => {
-  if (!plannerData) return null; // Avoid rendering empty content
+  if (!plannerData) return null;
 
   return (
+    
     <ComparisonWrapper>
       <ComparisonHeader>Comparison for Planner: {plannerData.planner_name}</ComparisonHeader>
 
-      <ComparisonTable>
-        <thead>
-          <tr>
-            <TableHeader>Metric</TableHeader>
-            <TableHeader>Amount</TableHeader>
-          </tr>
-        </thead>
-        <tbody>
-          <TableRow>
-            <TableData>Total Expenses</TableData>
-            <TableData>{plannerData.total_expenses}</TableData>
-          </TableRow>
-          <TableRow>
-            <TableData>Total Cash Flows</TableData>
-            <TableData>{plannerData.total_cash_flows}</TableData>
-          </TableRow>
-          <TotalRow>
-            <TableData>Cash Flow Left After Expenses</TableData>
-            <TableData>{plannerData.cash_flow_left}</TableData>
-          </TotalRow>
-        </tbody>
-      </ComparisonTable>
+      <div style={{ display: "flex", gap: "10px", marginTop: "10px", marginBottom: "10px" }}>
+        <ExportCSVButton plannerId={plannerData._id}>Export to CSV</ExportCSVButton>
+        <ExportPDFButton plannerId={plannerData._id}>Export to PDF</ExportPDFButton>
+      </div>
 
-      <ComparisonHeader>Expenses</ComparisonHeader>
+        <ComparisonTable>
+          <thead>
+            <tr>
+              <TableHeader>Metric</TableHeader>
+              <TableHeader>Values</TableHeader>
+            </tr>
+          </thead>
+          <tbody>
+            <TableRow>
+              <TableData>Total Expenses</TableData>
+              <TableData>{plannerData.total_expenses || 0}</TableData>
+            </TableRow>
+            <TableRow>
+              <TableData>Total Cash Flows</TableData>
+              <TableData>{plannerData.total_cash_flows || 0}</TableData>
+            </TableRow>
+            <TableRow>
+              <TableData>Which is Higher?</TableData>
+              {plannerData.which_is_higher === 'Expenses' ? (
+                <ExpenseTableData>{plannerData.which_is_higher}</ExpenseTableData>
+              ) : plannerData.which_is_higher === 'Cash Flows' ? (
+                <CashFlowTableData>{plannerData.which_is_higher}</CashFlowTableData>
+              ) : (
+                <TableData>{plannerData.which_is_higher}</TableData>
+              )}
+            </TableRow>
+            <TotalRow>
+              <TableData>Difference</TableData>
+              <TableData>{plannerData.difference || 0}</TableData>
+            </TotalRow>
+          </tbody>
+        </ComparisonTable>
+
+      <ComparisonSubHeader>Expenses</ComparisonSubHeader>
       <ComparisonTable>
         <thead>
           <tr>

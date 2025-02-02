@@ -71,7 +71,7 @@ const HeaderWrapper = styled.div`
 // `;
 
 //  ----------DEEP SEEK VERSION
-const LoginButton = styled(Link)`
+export const LoginButton = styled(Link)`
   padding: 12px 24px;
   background: linear-gradient(135deg, rgb(94, 89, 152) 0%, rgb(123, 118, 180) 100%);
   color: white;
@@ -97,7 +97,7 @@ const LoginButton = styled(Link)`
   }
 `;
 
-const SignUpButton = styled(Link)`
+export const SignUpButton = styled(Link)`
   padding: 12px 24px;
   background: rgba(102, 114, 102, 0.52);
   color: white;

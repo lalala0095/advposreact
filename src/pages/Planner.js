@@ -20,6 +20,10 @@ const Planners = ({ sidebarOpen }) => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     planner_name: '',
+    which_is_higher: '',
+    difference: '',
+    total_expenses: '',
+    total_cash_flows: '',
     expenses: [],
     cash_flows: [],
   });
@@ -31,10 +35,12 @@ const Planners = ({ sidebarOpen }) => {
   const [showComparison, setShowComparison] = useState(false);
   const [plannerData, setPlannerData] = useState(null);
 
-  const [difference, setDifference] = useState(0);
-  const [whichIsHigher, setWhichIsHigher] = useState('None');
-  const totalExpenses = selectedExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const totalCashFlows = selectedCashFlows.reduce((sum, cashFlow) => sum + cashFlow.amount, 0);
+  let [difference, setDifference] = useState(0);
+  let [whichIsHigher, setWhichIsHigher] = useState('None');
+  let [totalExpenses, setTotalExpenses] = useState(0);
+  let [totalCashFlows, setTotalCashFlows] = useState(0);
+  // const totalExpenses = selectedExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  // const totalCashFlows = selectedCashFlows.reduce((sum, cashFlow) => sum + cashFlow.amount, 0);
 
   // Function to toggle the visibility of comparison and fetch planner data
   const toggleComparison = async (plannerId) => {
@@ -56,6 +62,29 @@ const Planners = ({ sidebarOpen }) => {
     };
     fetchPlanners();
   }, [currentPage, currentPageLimit]);
+
+  useEffect(() => {
+    let newTotalExpenses = selectedExpenses.reduce((total, expense) => total + expense.amount, 0);
+    let newTotalCashFlows = selectedCashFlows.reduce((total, cashFlow) => total + cashFlow.amount, 0);
+    newTotalCashFlows = newTotalCashFlows.toFixed(2)
+    newTotalExpenses = newTotalExpenses.toFixed(2)
+    setTotalExpenses(newTotalExpenses);  // Set the new total expenses
+    setTotalCashFlows(newTotalCashFlows); // Set the new total cash flows
+  }, [selectedExpenses, selectedCashFlows]);  // Trigger when selectedExpenses or selectedCashFlows change
+
+  // Recalculate difference when totals change
+  useEffect(() => {
+    if (totalExpenses > totalCashFlows) {
+      setWhichIsHigher('Expenses');
+      setDifference((totalExpenses - totalCashFlows).toFixed(2));
+    } else if (totalCashFlows > totalExpenses) {
+      setWhichIsHigher('Cash Flows');
+      setDifference((totalCashFlows - totalExpenses).toFixed(2));
+    } else {
+      setWhichIsHigher('Equal');
+      setDifference(0);
+    }
+  }, [totalExpenses, totalCashFlows]); // Trigger this effect whenever totals change
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -87,48 +116,37 @@ const Planners = ({ sidebarOpen }) => {
     }
   };
 
-  const handleDifference = () => {
-    if (totalExpenses > totalCashFlows) {
-      setWhichIsHigher('Expenses');
-      setDifference((totalExpenses - totalCashFlows).toFixed(2));
-    } else if (totalCashFlows > totalExpenses) {
-      setWhichIsHigher('Cash Flows')
-      setDifference((totalCashFlows - totalExpenses).toFixed(2));
-    } else if (totalCashFlows === totalExpenses) {
-      setWhichIsHigher('Equal')
-      setDifference(0);
-    }
-  };
+  // const handleDifference = () => {
+  //   if (totalExpenses > totalCashFlows) {
+  //     setWhichIsHigher('Expenses');
+  //     setDifference((totalExpenses - totalCashFlows).toFixed(2));
+  //   } else if (totalCashFlows > totalExpenses) {
+  //     setWhichIsHigher('Cash Flows')
+  //     setDifference((totalCashFlows - totalExpenses).toFixed(2));
+  //   } else if (totalCashFlows === totalExpenses) {
+  //     setWhichIsHigher('Equal')
+  //     setDifference(0);
+  //   }
+  // };
 
   const handleSelectExpense = (expense) => {
     setSelectedExpenses((prevExpenses) => {
-      // If the expense is already selected, remove it
       if (prevExpenses.some((item) => item._id === expense._id)) {
-        return prevExpenses.filter((item) => item._id !== expense._id);
-      } 
-      // Otherwise, add it
-      return [...prevExpenses, expense];
+        return prevExpenses.filter((item) => item._id !== expense._id); // Remove the expense
+      }
+      return [...prevExpenses, expense]; // Add the expense
     });
-    handleDifference();
-
-    // Calculate the total expenses dynamically based on selected expenses
-    const newTotalExpenses = selectedExpenses.reduce((total, expense) => total + expense.amount, 0);
-    setTotalExpenses(newTotalExpenses); // Update total expenses state
-    
-    // After updating the total expenses, call handleDifference
-    handleDifference();
   };
-
+  
   const handleSelectCashFlow = (cashFlow) => {
     setSelectedCashFlows((prevCashFlows) => {
       if (prevCashFlows.some((item) => item._id === cashFlow._id)) {
-        return prevCashFlows.filter((item) => item._id !== cashFlow._id);
+        return prevCashFlows.filter((item) => item._id !== cashFlow._id); // Remove the cash flow
       }
-      return [...prevCashFlows, cashFlow];
+      return [...prevCashFlows, cashFlow]; // Add the cash flow
     });
-    handleDifference();
   };
-
+  
   const handleRefresh = () => {
     setRefreshKey(prevKey => prevKey + 1);
   }
@@ -140,6 +158,10 @@ const Planners = ({ sidebarOpen }) => {
       planner_name: formData.planner_name,
       expenses: selectedExpenses,
       cash_flows: selectedCashFlows,
+      which_is_higher: whichIsHigher,
+      difference: difference,
+      total_expenses: totalExpenses,
+      total_cash_flows: totalCashFlows,
     };
   
     try {
@@ -148,7 +170,15 @@ const Planners = ({ sidebarOpen }) => {
   
       if (response.ok) {
         handleFlashMessage(result.message);
-        setFormData({ planner_name: '', expenses: [], cash_flows: [] });
+        setFormData({ 
+          planner_name: '',
+          which_is_higher: '',
+          difference: '',
+          total_expenses: '',
+          total_cash_flows: '',
+          expenses: [],
+          cash_flows: []
+        });
         setSelectedExpenses([]);
         setSelectedCashFlows([]);
         setShowForm(false);
@@ -231,7 +261,11 @@ const Planners = ({ sidebarOpen }) => {
                       <tr>
                         <td>{ totalExpenses }</td>
                         <td>{ totalCashFlows }</td>
-                        <td>{ whichIsHigher }</td>
+                        <td>
+                          <strong>
+                            { whichIsHigher }
+                          </strong>
+                        </td>
                         <td>{ difference }</td>
                       </tr>
                   </tbody>
@@ -316,7 +350,7 @@ const Planners = ({ sidebarOpen }) => {
                     ))}
                     <tr>
                       <td><strong>Total Expenses</strong></td>
-                      <td><strong>{totalExpenses.toFixed(2)}</strong></td>
+                      <td><strong>{totalExpenses}</strong></td>
                     </tr>
                   </tbody>
                 </table>
@@ -338,7 +372,7 @@ const Planners = ({ sidebarOpen }) => {
                     ))}
                     <tr>
                       <td><strong>Total Cash Flows</strong></td>
-                      <td><strong>{totalCashFlows.toFixed(2)}</strong></td>
+                      <td><strong>{totalCashFlows}</strong></td>
                     </tr>
                   </tbody>
                 </table>
