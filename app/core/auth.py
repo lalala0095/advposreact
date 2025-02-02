@@ -37,7 +37,10 @@ async def store_token_in_redis(account_id: str, token: str, expiration: int = 36
     account_object["sub"] = str(account_object["_id"])
     del account_object["_id"] 
     del account_object["date_added"]
-    del account_object["date_synched"]
+    try:
+        del account_object["date_synched"]
+    except Exception as e:
+        print(e)
     del account_object["password"]
     account_object['token'] = token
     account_object['subscription_expiration'] = pd.to_datetime(account_object['subscription_expiration']).strftime("%Y-%m-%d %H:%M")
