@@ -11,7 +11,6 @@ import {
   EditButton,
   DeleteButton,
 } from '../styles/BillersStyles';
-import apiService from '../services/apiService';
 import PaginationControl from './PaginationControl';
 
 const ExpensesTable = ({ 

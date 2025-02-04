@@ -1,16 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import styled from 'styled-components';
 const CashFlowPieChart = ({ data }) => {
-  const ChartsContainer = styled.div`
-  .row {
-    border: 1px solid white;
-  }
-  .col {
-    border: 1px solid white;
-  }
-`;
-
   console.log("Received Data:", data);
   const chartData = data.map(item => ({
     name: item["Cash Flow Type"],  // This is what will show in the legend and tooltip by default

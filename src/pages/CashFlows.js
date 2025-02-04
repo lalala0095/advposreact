@@ -8,8 +8,6 @@ import { CashFlowTypeDropdown } from '../components/Dropdowns';
 import apiService from '../services/apiService';
 
 const CashFlowsPage = ({ sidebarOpen }) => {
-  const [totalItems, setTotalItems] = useState([]);
-  const [totalPages, setTotalPages] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageLimit, setCurrentPageLimit] = useState(10);
