@@ -13,6 +13,7 @@ const HeaderWrapper = styled.div`
   align-items: center;
   text-align: center;
   font-size: 1rem;
+  position: fixed;
 `;
 
 const Header = () => {

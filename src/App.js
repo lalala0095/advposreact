@@ -24,6 +24,7 @@ import AuthProvider from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Planners from './pages/Planner';
 import EditPlannerPage from './pages/EditPlanner';
+import Footer from './components/Footer';
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -36,6 +37,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <Router>
         <GlobalStyle />
+        <Header />
         <AuthProvider>
           <Routes>
             {/* LandPage Route - No Sidebar or Header */}
@@ -48,7 +50,7 @@ const App = () => {
                 <AppWrapper>
                   <Sidebar onSidebarToggle={handleSidebarToggle} />
                   <ContentWrapper isSidebarOpen={isSidebarOpen}>
-                    <Header />
+                    
                     <Routes>
                       <Route path="/login" element={<Login />} />
                       <Route path="/signup" element={<Signup />} />
@@ -107,12 +109,14 @@ const App = () => {
                       />
                       <Route path="/about_the_dev" element={<AboutTheDev />} />
                     </Routes>
+                    
                   </ContentWrapper>
                 </AppWrapper>
               }
             />
           </Routes>
         </AuthProvider>
+        <Footer />
       </Router>
     </ThemeProvider>
   );
