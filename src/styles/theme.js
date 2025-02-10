@@ -1,7 +1,7 @@
 // styles/theme.js
 const theme = {
     backgroundImage: "url('/images/background.png')",
-    backgroundSize: "cover",
+    backgroundSize: "fill",
     backgroundPosition: "center",
     // backgroundColor: '#333131',
     textColor: '#E0E0E0',

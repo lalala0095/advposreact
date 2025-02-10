@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -9,7 +8,6 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
-import apiService from "../services/apiService";
 
 const DailyChart = ({ data_input }) => {
   const chartData = data_input.map(item => ({

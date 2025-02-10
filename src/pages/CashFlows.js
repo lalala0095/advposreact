@@ -154,7 +154,7 @@ const CashFlowsPage = ({ sidebarOpen }) => {
           onPageLimitChange={handlePageLimitChange}        
         />
         {showForm && (
-          <FormWrapper onSubmit={handleAddCashFlow}>
+          <FormWrapper onSubmit={handleAddCashFlow} className='cash-flows-form-wrapper'>
             <h3>Add New Cash Flow*</h3>
             <FormRow>
               <Label htmlFor="date_of_transaction">Date of Transaction</Label>

@@ -7,12 +7,13 @@ const HeaderWrapper = styled.div`
   background-color: #333;
   padding: 20px;
   color: #fff;
-  height: 30px;
+  height: 1vh;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-  font-size: 1rem;
+  font-size: 1vh;
+  position: fixed;
 `;
 
 const Header = () => {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PlannersTable from '../components/PlannersTable';
 import FlashMessage from '../components/FlashMessage'; 
 import apiService from '../services/apiService';
@@ -15,7 +14,6 @@ const Planners = ({ sidebarOpen }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageLimit, setCurrentPageLimit] = useState(10);
-  const navigate = useNavigate();
   const [flashMessage, setFlashMessage] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -196,7 +194,6 @@ const Planners = ({ sidebarOpen }) => {
     const response = await apiService.deletePlanner(plannerId);
     try {
       handleFlashMessage(response.data.message + " Refreshing the page.");
-      const updatedPlanners = await apiService.getPlanners(currentPage, currentPageLimit);
       setRefreshKey(prevKey => prevKey + 1);
     } catch (error) {
       console.error(error);

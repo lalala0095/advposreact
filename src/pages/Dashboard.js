@@ -1,4 +1,4 @@
-import { DashboardContainer, Section, LoginMessage, CardWrapper, ChartsContainer } from '../styles/Dashboard';
+import { DashboardContainer, LoginMessage, CardWrapper, ChartsContainer } from '../styles/Dashboard';
 import DailyChart from "../components/DailyCashFlowChart";
 import SummaryCard from '../components/SummaryCard';
 import apiService from '../services/apiService';
