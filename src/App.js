@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
 import Login from './pages/Login';
 import Billers from './pages/Billers';
+import BillersPage from './pages/Billers';
 import EditBillerPage from './pages/EditBiller';
 import CashFlows from './pages/CashFlows';
 import EditCashFlow from './pages/EditCashFlow';
@@ -31,6 +32,7 @@ const App = () => {
 
   const handleSidebarToggle = (isOpen) => {
     setIsSidebarOpen(isOpen);
+    console.log("Sidebar Toggle:", isOpen);
   };
 
   return (
@@ -48,9 +50,8 @@ const App = () => {
               path="/*"
               element={
                 <AppWrapper className='app-wrapper'>
-                  <Sidebar onSidebarToggle={handleSidebarToggle} />
+                  <Sidebar isSidebarOpen={isSidebarOpen} onSidebarToggle={handleSidebarToggle} />
                   <ContentWrapper isSidebarOpen={isSidebarOpen}>
-                    
                     <Routes>
                       <Route path="/login" element={<Login />} />
                       <Route path="/signup" element={<Signup />} />
@@ -59,7 +60,7 @@ const App = () => {
                         path="/settings"
                         element={
                           <ProtectedRoute>
-                            <Settings />
+                            <Settings  isSidebarOpen={isSidebarOpen} />
                           </ProtectedRoute>
                         }
                       />
@@ -68,7 +69,7 @@ const App = () => {
                         path="/billers"
                         element={
                           <ProtectedRoute>
-                            <Billers />
+                            <BillersPage isSidebarOpen={isSidebarOpen} />
                           </ProtectedRoute>
                         }
                       />
@@ -77,7 +78,7 @@ const App = () => {
                         path="/expenses"
                         element={
                           <ProtectedRoute>
-                            <Expenses />
+                            <Expenses  isSidebarOpen={isSidebarOpen} />
                           </ProtectedRoute>
                         }
                       />
@@ -86,7 +87,7 @@ const App = () => {
                         path="/planners"
                         element={
                           <ProtectedRoute>
-                            <Planners />
+                            <Planners  isSidebarOpen={isSidebarOpen} />
                           </ProtectedRoute>
                         }
                       />
@@ -95,7 +96,7 @@ const App = () => {
                         path="/cash_flows"
                         element={
                           <ProtectedRoute>
-                            <CashFlows />
+                            <CashFlows  isSidebarOpen={isSidebarOpen} />
                           </ProtectedRoute>
                         }
                       />
@@ -103,11 +104,11 @@ const App = () => {
                         path="/reports"
                         element={
                           <ProtectedRoute>
-                            <Reports />
+                            <Reports  isSidebarOpen={isSidebarOpen} />
                           </ProtectedRoute>
                         }
                       />
-                      <Route path="/about_the_dev" element={<AboutTheDev />} />
+                      <Route path="/about_the_dev" element={<AboutTheDev isSidebarOpen={{isSidebarOpen}} />} />
                     </Routes>
                     
                   </ContentWrapper>

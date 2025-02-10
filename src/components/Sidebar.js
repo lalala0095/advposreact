@@ -12,6 +12,7 @@ const SidebarWrapper = styled.div`
   background-color: ${(props) => props.theme.sidebarBackground};
   transition: width 0.3s;
   position: fixed;
+  top: 0;
   height: 100%;
   padding: 10px;
   display: flex;
@@ -142,46 +143,33 @@ const ModalContent = styled.div`
   max-width: 90%;
 `;
 
-const Sidebar = ({ onSidebarToggle }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+const Sidebar = ({ isSidebarOpen, onSidebarToggle}) => {
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const isSidebarVisible = location.pathname !== '/';
-
-  const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state  
-
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const handleSidebarToggle = () => {
+    onSidebarToggle(!isSidebarOpen); // Toggling sidebar state
+  };
   const handleLogout = () => {
     logout(); // Clear session
     navigate('/'); // Redirect to login page
   };
 
-  const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-    onSidebarToggle(!isSidebarOpen);
-  };
-
   // Handle screen resizing
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsSidebarOpen(false);
-      } else {
-        setIsSidebarOpen(true);
-      }
-    };
-
-    // Run on component mount
-    handleResize();
-
-    // Add event listener
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);  
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth < 768 && isSidebarOpen) {
+  //       setIsSidebarOpen(false);
+  //     } else {
+  //       setIsSidebarOpen(true);
+  //     }
+  //   };
+  //   window.addEventListener('resize', handleResize);
+  //   return () => window.removeEventListener('resize', handleResize);
+  // }, [isSidebarOpen]);
 
   if (!isAuthenticated) {
     return (

@@ -11,7 +11,6 @@ const StyledResponsiveContainer = styled(ResponsiveContainer)`
 `;
 
 const CashFlowPieChart = ({ data }) => {
-  console.log("Received Data:", data);
   const chartData = data.map(item => ({
     name: item["Cash Flow Type"],  // This is what will show in the legend and tooltip by default
     value: item.Amount,           // This is the value used to size the slices

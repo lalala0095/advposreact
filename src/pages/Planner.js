@@ -8,7 +8,7 @@ import {
 } from '../styles/BillersStyles';
 import ViewComparison from '../components/ViewComparison';
 
-const Planners = ({ sidebarOpen }) => {
+const Planners = ({ isSidebarOpen }) => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -203,7 +203,7 @@ const Planners = ({ sidebarOpen }) => {
 
   return (
     <PageContainer>
-      <ContentContainer sidebarOpen={sidebarOpen}>
+      <ContentContainer isSidebarOpen={isSidebarOpen}>
         <Header>
           <h1>Manage Planners</h1>
           <AddButton onClick={handleAddPlannerClick}>

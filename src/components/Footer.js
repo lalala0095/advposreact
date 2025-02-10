@@ -3,10 +3,11 @@ import styled from 'styled-components';
 
 const FooterWrapper = styled.div`
   border: 1px solid red;
+  position: fixed;
   bottom: 0;
   width: 100%;
   background-color: grey;
-  opacity: 0.5;
+  opacity: 0.9;
   padding: 20px;
   color: #fff;
   height: 1%;

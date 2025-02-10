@@ -6,7 +6,7 @@ import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, He
 import { ExpensePlatformDropdown, ExpenseTypeDropdown } from '../components/Dropdowns';
 import apiService from '../services/apiService';
 
-const Expenses = ({ sidebarOpen }) => {
+const Expenses = ({ isSidebarOpen }) => {
   const [totalItems, setTotalItems] = useState([]);
   const [totalPages, setTotalPages] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -127,7 +127,7 @@ const Expenses = ({ sidebarOpen }) => {
 
   return (
     <PageContainer>
-      <ContentContainer sidebarOpen={sidebarOpen}>
+      <ContentContainer isSidebarOpen={isSidebarOpen}>
         <Header>
           <h1>Manage Expenses</h1>
           <AddButton onClick={() => setShowForm(!showForm)}>

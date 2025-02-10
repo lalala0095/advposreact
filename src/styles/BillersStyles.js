@@ -12,15 +12,30 @@ export const ViewComparisonButton = styled.button`
 export const FormWrapper = styled.form`
 margin-top: 20px;
 margin-left: 20px;
-padding: 20px;
+padding: 2vh;
 background-color: #333131;
 border: 1px solid #ccc;
 border-radius: 8px;
 color: #fff;
-margin-bottom: 100px;
-width:80vw;
-max-width: 400px;
-font-size: 1.3vh;
+margin-bottom: 10vh;
+font-size: 1vh;
+max-width: 40vh;
+
+@media (max-width: 1200px) {
+  font-size: 1vh;
+  max-width: 40vh;
+}
+
+@media (max-width: 768px) {
+  font-size: .7vh;
+  max-width: 40vh;
+}
+
+@media (max-width: 480px) {
+  font-size: .7vh;
+  max-width: 40vh;
+}
+
 `;
 
 export const PlannerFormWrapper = styled.form`
@@ -56,6 +71,19 @@ export const FormRow = styled.div`
   input[type='number'] {
     -moz-appearance: textfield;
   }
+
+
+  @media (max-width: 1200px) {
+    font-size: 1vh;
+  }
+
+  @media (max-width: 768px) {
+    font-size: .7vh;
+  }
+
+  @media (max-width: 480px) {
+    font-size: .7vh;
+  }
 `;
 
 export const Label = styled.label`
@@ -63,6 +91,19 @@ export const Label = styled.label`
   margin-bottom: 8px;
   color: #fff;
   font-size: 2vh;
+
+  @media (max-width: 1200px) {
+    font-size: 1.5vh;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.2vh;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1vh;
+  }
+
 `;
 
 export const InputField = styled.input`
@@ -70,7 +111,22 @@ export const InputField = styled.input`
   margin-bottom: 10px;
   border-radius: 4px;
   background-color: #f8f8f8;
-  font-size: 1.3vh;
+  width: 400px;
+
+  @media (max-width: 1200px) {
+    font-size: 1.5vh;
+    width: 1vh;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.2vh;
+    width: 1vh;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1vh;
+    width: 10vh;
+  }
 `;
 
 export const DateInputField = styled.input.attrs({ type: 'date' })`
@@ -139,7 +195,7 @@ export const AddButton = styled.button`
   background-color: #28a745;
   border: none;
   color: #fff;
-  font-size: 14px;
+  font-size: 1.5vh;
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 15px;
@@ -147,6 +203,19 @@ export const AddButton = styled.button`
   &:hover {
     background-color: #218838;
   }
+
+  @media (max-width: 1200px) {
+    margin-right: ${(props) => (props.isSidebarOpen ? '2vh' : '1vh')};
+  }
+
+  @media (max-width: 768px) {
+    margin-right: ${(props) => (props.isSidebarOpen ? '10vh' : '6vh')};
+  }
+
+  @media (max-width: 480px) {
+    margin-right: ${(props) => (props.isSidebarOpen ? '22vh' : '6vh')};
+  }
+
 `;
 
 export const Header = styled.div`
@@ -166,7 +235,7 @@ export const ContentContainer = styled.div`
   flex-grow: 1;
   margin-top: 50px;
   padding: 20px;
-  margin-left: ${({ sidebarOpen }) => (sidebarOpen ? '0' : '0')};
+  margin-left: ${({ isSidebarOpen }) => (isSidebarOpen ? '0' : '0')};
   transition: margin-left 0.3s ease-in-out;
 `;
 
@@ -175,6 +244,18 @@ export const TableWrapper = styled.div`
   padding: 20px;
   overflow-x: auto;
   white-space: nowrap;
+
+  @media (max-width: 1200px) {
+    font-size: 1.5vh;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1vh;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1vh;
+  }
 `;
 
 export const Table = styled.table`
@@ -182,6 +263,18 @@ export const Table = styled.table`
   border-collapse: collapse;
   margin-top: 20px;
   min-width: 600px;
+
+  @media (max-width: 1200px) {
+    font-size: 1.5vh;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1vh;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1vh;
+  }
 `;
 
 export const TableHeader = styled.th`
@@ -194,7 +287,18 @@ export const TableRow = styled.tr`
   &:hover {
     background-color:rgb(113, 109, 109);
   }
-  font-size: 14px;
+  
+  @media (max-width: 1200px) {
+    font-size: 1.5vh;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1vh;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1vh;
+  }
 `;
 
 export const TableData = styled.td`
@@ -240,6 +344,18 @@ export const DropdownWrapper = styled.div`
     background-color: #fff;
     border-color: #80bdff;
     box-shadow: 0 0 0 0.25rem rgba(38, 143, 255, 0.25);
+  }
+  
+  @media (max-width: 1200px) {
+    font-size: 1.5vh;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.2vh;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1vh;
   }
 `;
 

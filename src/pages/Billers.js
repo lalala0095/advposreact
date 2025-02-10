@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BillersTable from '../components/BillersTable';
 import FlashMessage from '../components/FlashMessage'; 
-import { FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, Label } from '../styles/BillersStyles';
+import { InputField, FormRow, FormWrapper, SubmitButton, PageContainer, ContentContainer, Header, AddButton, Label } from '../styles/BillersStyles';
 import { AmountTypeDropdown, BillerTypeDropdown } from '../components/Dropdowns';
 import apiService from '../services/apiService';
 
-const BillersPage = ({ sidebarOpen }) => {
+const BillersPage = ({ isSidebarOpen }) => {
   const [totalItems, setTotalItems] = useState([]);
   const [totalPages, setTotalPages] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -111,12 +111,19 @@ const BillersPage = ({ sidebarOpen }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  useEffect(() => {
+    console.log("Sidebar Open state changed:", isSidebarOpen);
+  }, [isSidebarOpen]);
+
   return (
     <PageContainer>
-      <ContentContainer sidebarOpen={sidebarOpen}>
+      <ContentContainer isSidebarOpen={isSidebarOpen}>
         <Header>
           <h1>Manage Billers</h1>
-          <AddButton onClick={() => setShowForm(!showForm)}>
+          <AddButton isSidebarOpen={isSidebarOpen} onClick={() => {
+            console.log("Sidebar Open:", isSidebarOpen);
+            setShowForm(!showForm);
+          }}>
             {showForm ? 'Cancel' : 'Add New Biller'}
           </AddButton>
         </Header>
@@ -138,7 +145,7 @@ const BillersPage = ({ sidebarOpen }) => {
             <h3>Add New Biller*</h3>
             <FormRow>
               <label htmlFor="biller_name">Biller Name*</label>
-              <input
+              <InputField
                 id="biller_name"
                 name="biller_name"
                 value={formData.biller_name || ''}
@@ -154,7 +161,7 @@ const BillersPage = ({ sidebarOpen }) => {
             </FormRow>
             <FormRow>
               <label htmlFor="custom_type">Custom Type</label>
-              <input
+              <InputField
                 id="custom_type"
                 name="custom_type"
                 value={formData.custom_type || ''}
@@ -163,7 +170,7 @@ const BillersPage = ({ sidebarOpen }) => {
             </FormRow>
             <FormRow>
               <label htmlFor="amount">Amount*</label>
-              <input
+              <InputField
                 id="amount"
                 name="amount"
                 type='number'
@@ -173,7 +180,7 @@ const BillersPage = ({ sidebarOpen }) => {
             </FormRow>
             <FormRow>
               <label htmlFor="usual_due_date_day">Usual Due Date Day</label>
-              <input
+              <InputField
                 id="usual_due_date_day"
                 name="usual_due_date_day"
                 type='number'
