@@ -1,7 +1,14 @@
 import styled from 'styled-components';
 
 export const DashboardContainer = styled.div`
-  border-radius: 8px;
+  font-size: 1.5vh;
+  overflow-x: auto;
+  width: 100%;
+  height: 100%;
+  border: 1px solid red;
+  margin-left: 0px;
+  margin-top: 50px;
+  margin-bottom: 0px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: block;
@@ -11,11 +18,13 @@ export const DashboardContainer = styled.div`
 `;
 
 export const ChartsContainer = styled.div`
+  border: 2px solid red;
   display: flex;
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
   margin-top: 30px;
+  width: 100vw;
   
   .row {
     display: flex;

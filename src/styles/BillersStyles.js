@@ -6,7 +6,7 @@ export const ViewComparisonButton = styled.button`
   border: none;
   color: yellow;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1.3vh;
 `;
 
 export const FormWrapper = styled.form`
@@ -17,7 +17,10 @@ background-color: #333131;
 border: 1px solid #ccc;
 border-radius: 8px;
 color: #fff;
-max-width: 420px;
+margin-bottom: 100px;
+width:80vw;
+max-width: 400px;
+font-size: 1.3vh;
 `;
 
 export const PlannerFormWrapper = styled.form`
@@ -59,15 +62,15 @@ export const Label = styled.label`
   display: block;
   margin-bottom: 8px;
   color: #fff;
+  font-size: 2vh;
 `;
 
 export const InputField = styled.input`
-  width: 100%;
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 4px;
-  border: 1px solid #ccc;
   background-color: #f8f8f8;
+  font-size: 1.3vh;
 `;
 
 export const DateInputField = styled.input.attrs({ type: 'date' })`
@@ -159,22 +162,26 @@ export const PageContainer = styled.div`
 `;
 
 export const ContentContainer = styled.div`
+  border: 1px solid red;
   flex-grow: 1;
+  margin-top: 50px;
   padding: 20px;
-  margin-left: ${({ sidebarOpen }) => (sidebarOpen ? '250px' : '0')};
+  margin-left: ${({ sidebarOpen }) => (sidebarOpen ? '0' : '0')};
   transition: margin-left 0.3s ease-in-out;
 `;
 
 export const TableWrapper = styled.div`
+  border: 1px solid red;
   padding: 20px;
-  width: 100%;
   overflow-x: auto;
+  white-space: nowrap;
 `;
 
 export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  min-width: 600px;
 `;
 
 export const TableHeader = styled.th`

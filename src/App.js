@@ -47,7 +47,7 @@ const App = () => {
             <Route
               path="/*"
               element={
-                <AppWrapper>
+                <AppWrapper className='app-wrapper'>
                   <Sidebar onSidebarToggle={handleSidebarToggle} />
                   <ContentWrapper isSidebarOpen={isSidebarOpen}>
                     
@@ -115,8 +115,8 @@ const App = () => {
               }
             />
           </Routes>
+          <Footer />
         </AuthProvider>
-        <Footer />
       </Router>
     </ThemeProvider>
   );

@@ -5,7 +5,7 @@ const CardContainer = styled.div`
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   background-color: rgba(86, 80, 80, 0.71);
   border-radius: 10px;
-  padding: 20px;
+  padding: 2vh;
   min-width: 50px;
   max-width: 100px;
   text-align: center;
@@ -15,13 +15,13 @@ const CardContainer = styled.div`
 `;
 
 const Title = styled.h3`
-  font-size: 0.75rem;
+  font-size: 1.5vh;
   margin-bottom: 10px;
   color: white;
 `;
 
 const Value = styled.p`
-  font-size: 1rem;
+  font-size: 2vh;
   font-weight: bold;
   color:rgb(255, 255, 255);
 `;

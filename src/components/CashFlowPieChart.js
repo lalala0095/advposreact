@@ -1,5 +1,15 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import styled from 'styled-components';
+
+const StyledResponsiveContainer = styled(ResponsiveContainer)`
+  border: 1px solid green;
+  width: 100%;
+  height: 50vh;
+  height: 100%;
+  border: 1px solid
+`;
+
 const CashFlowPieChart = ({ data }) => {
   console.log("Received Data:", data);
   const chartData = data.map(item => ({
@@ -12,8 +22,8 @@ const CashFlowPieChart = ({ data }) => {
   const COLORS = ["#4BC0C0", "#FF9F40", "#23781e", "9ca2d1", "ef8ae1" ];
 
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <PieChart height={400} width={400}>
+    <StyledResponsiveContainer>
+      <PieChart height={400} minWidth={400} maxWidth={400}>
         <Pie
           data={chartData}
           dataKey="value"
@@ -69,7 +79,7 @@ const CashFlowPieChart = ({ data }) => {
           }}
         />
       </PieChart>
-    </ResponsiveContainer>
+    </StyledResponsiveContainer>
   );
 };
 

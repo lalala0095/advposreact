@@ -2,15 +2,15 @@ import React from 'react';
 import styled from 'styled-components';
 
 const FooterWrapper = styled.div`
-  // margin-bottom: 0;
-  position: fixed;
+  border: 1px solid red;
   bottom: 0;
   width: 100%;
   background-color: grey;
   opacity: 0.5;
   padding: 20px;
   color: #fff;
-  height: 30px;
+  height: 1%;
+  max-height: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -20,7 +20,7 @@ const FooterWrapper = styled.div`
 
 const Footer = () => {
   return (
-    <FooterWrapper>
+    <FooterWrapper className='footer-wrapper'>
       <h1>Website Under Construction</h1>
     </FooterWrapper>
   );

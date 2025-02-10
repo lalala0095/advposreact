@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaPiggyBank, FaBars, FaHome, FaChartBar, FaCog, FaSignInAlt, FaUserPlus, FaHandHoldingUsd, FaAddressCard, FaSignOutAlt } from 'react-icons/fa';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -7,7 +7,8 @@ import { FaMoneyBill1Wave } from 'react-icons/fa6';
 
 // Styled Sidebar
 const SidebarWrapper = styled.div`
-  width: ${(props) => (props.isSidebarOpen ? '250px' : '60px')};
+  border: 1px solid red;
+  width: ${(props) => (props.isSidebarOpen ? '18vh' : '2.5vh')};
   background-color: ${(props) => props.theme.sidebarBackground};
   transition: width 0.3s;
   position: fixed;
@@ -18,6 +19,19 @@ const SidebarWrapper = styled.div`
   align-items: center;
   display: ${(props) => (props.isSidebarVisible ? 'flex' : 'none')};
   z-index: 9999;
+
+  @media (max-width: 1200px) {
+    width: ${(props) => (props.isSidebarOpen ? '20vh' : '1.75vh')};
+  }
+
+  @media (max-width: 768px) {
+    width: ${(props) => (props.isSidebarOpen ? '15vh' : '1.5vh')};
+  }
+
+  @media (max-width: 480px) {
+    width: ${(props) => (props.isSidebarOpen ? '10vh' : '1.5vh')};
+  }
+
 `;
 
 const SidebarHeader = styled.div`
@@ -30,12 +44,12 @@ const SidebarHeader = styled.div`
 const MenuItem = styled(Link)`
   color: ${(props) => props.theme.sidebarTextColor};
   text-decoration: none;
-  font-size: 20px;
+  font-size: 2.2vh;
   margin: 20px 0;
   display: flex;
   align-items: center;
-  width: 100%;
   padding: 10px;
+  width: 100%;
   transition: background-color 0.2s;
   &:hover {
     background-color: #333;
@@ -43,12 +57,25 @@ const MenuItem = styled(Link)`
   svg {
     margin-right: ${(props) => (props.isSidebarOpen ? '10px' : '0')};
   }
+
+  @media (max-width: 1200px) {
+      font-size: 3vh;
+  }
+
+  @media (max-width: 768px) {
+      font-size: 1.75vh;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.5vh;
+  }
 `;
 
 const MenuItemlogout = styled(Link)`
   color: ${(props) => props.theme.sidebarTextColor};
   text-decoration: none;
-  font-size: 20px;
+  font-size: 2.5vh;
+  font-color: solid red;
   margin-top: auto;
   margin-bottom: 20px;
   display: flex;
@@ -61,6 +88,18 @@ const MenuItemlogout = styled(Link)`
   }
   svg {
     margin-right: ${(props) => (props.isSidebarOpen ? '10px' : '0')};
+  }
+
+  @media (max-width: 1200px) {
+    font-size: 3vh;
+  }
+
+  @media (max-width: 768px) {
+      font-size: 1.75vh;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.5vh;
   }
 `;
 
@@ -110,7 +149,7 @@ const Sidebar = ({ onSidebarToggle }) => {
   const location = useLocation();
   const isSidebarVisible = location.pathname !== '/';
 
-  const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
+  const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state  
 
   const handleLogout = () => {
     logout(); // Clear session
@@ -121,6 +160,28 @@ const Sidebar = ({ onSidebarToggle }) => {
     setIsSidebarOpen(!isSidebarOpen);
     onSidebarToggle(!isSidebarOpen);
   };
+
+  // Handle screen resizing
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    // Run on component mount
+    handleResize();
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);  
 
   if (!isAuthenticated) {
     return (
