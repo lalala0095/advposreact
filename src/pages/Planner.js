@@ -4,7 +4,10 @@ import FlashMessage from '../components/FlashMessage';
 import apiService from '../services/apiService';
 import {
   PageContainer, ContentContainer, Header, AddButton, Label,
-  PlannerFormWrapper, FormRow, SubmitButton
+  PlannerFormWrapper, FormRow, SubmitButton,
+  InputField,
+  CheckBox,
+  AllocationInput
 } from '../styles/BillersStyles';
 import ViewComparison from '../components/ViewComparison';
 
@@ -22,6 +25,8 @@ const Planners = ({ isSidebarOpen }) => {
     difference: '',
     total_expenses: '',
     total_cash_flows: '',
+    which_is_higher_allocation: '',
+    difference_allocation: '',
     expenses: [],
     cash_flows: [],
   });
@@ -34,11 +39,12 @@ const Planners = ({ isSidebarOpen }) => {
   const [plannerData, setPlannerData] = useState(null);
 
   let [difference, setDifference] = useState(0);
-  let [whichIsHigher, setWhichIsHigher] = useState('None');
+  let [differenceAllocation, setDifferenceAllocation] = useState(0);
   let [totalExpenses, setTotalExpenses] = useState(0);
   let [totalCashFlows, setTotalCashFlows] = useState(0);
-  // const totalExpenses = selectedExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  // const totalCashFlows = selectedCashFlows.reduce((sum, cashFlow) => sum + cashFlow.amount, 0);
+  let [totalAllocation, setTotalAllocation] = useState(0);
+  let [whichIsHigher, setWhichIsHigher] = useState('None');
+  let [whichIsHigherAllocation, setWhichIsHigherAllocation] = useState('None');
 
   // Function to toggle the visibility of comparison and fetch planner data
   const toggleComparison = async (plannerId) => {
@@ -82,7 +88,20 @@ const Planners = ({ isSidebarOpen }) => {
       setWhichIsHigher('Equal');
       setDifference(0);
     }
-  }, [totalExpenses, totalCashFlows]); // Trigger this effect whenever totals change
+  }, [totalExpenses, totalCashFlows, totalAllocation]);
+
+  useEffect(() => {
+    if (totalAllocation > totalCashFlows) {
+      setWhichIsHigherAllocation('Allocation');
+      setDifferenceAllocation((totalAllocation - totalCashFlows).toFixed(2));
+    } else if (totalCashFlows > totalAllocation) {
+      setWhichIsHigherAllocation('Cash Flows');
+      setDifferenceAllocation((totalCashFlows - totalAllocation).toFixed(2));
+    } else {
+      setWhichIsHigherAllocation('Equal');
+      setDifferenceAllocation(0);
+    }
+  }, [totalAllocation, totalCashFlows, totalExpenses]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -114,27 +133,27 @@ const Planners = ({ isSidebarOpen }) => {
     }
   };
 
-  // const handleDifference = () => {
-  //   if (totalExpenses > totalCashFlows) {
-  //     setWhichIsHigher('Expenses');
-  //     setDifference((totalExpenses - totalCashFlows).toFixed(2));
-  //   } else if (totalCashFlows > totalExpenses) {
-  //     setWhichIsHigher('Cash Flows')
-  //     setDifference((totalCashFlows - totalExpenses).toFixed(2));
-  //   } else if (totalCashFlows === totalExpenses) {
-  //     setWhichIsHigher('Equal')
-  //     setDifference(0);
-  //   }
-  // };
-
   const handleSelectExpense = (expense) => {
     setSelectedExpenses((prevExpenses) => {
       if (prevExpenses.some((item) => item._id === expense._id)) {
-        return prevExpenses.filter((item) => item._id !== expense._id); // Remove the expense
+        return prevExpenses.filter((item) => item._id !== expense._id);
       }
-      return [...prevExpenses, expense]; // Add the expense
+      return [...prevExpenses, { ...expense, allocation: 0}];
     });
   };
+
+  const handleAllocationChange = (expenseId, value) => {
+    setSelectedExpenses((prevExpenses) =>
+      prevExpenses.map((item) =>
+        item._id === expenseId ? { ...item, allocation: parseFloat(value) || 0 } : item
+      )
+    );
+  };
+
+  useEffect(() => {
+    const newTotalAllocation = selectedExpenses.reduce((total, expense) => total + expense.allocation, 0);
+    setTotalAllocation(newTotalAllocation.toFixed(2));
+  }, [selectedExpenses]);
   
   const handleSelectCashFlow = (cashFlow) => {
     setSelectedCashFlows((prevCashFlows) => {
@@ -160,6 +179,8 @@ const Planners = ({ isSidebarOpen }) => {
       difference: difference,
       total_expenses: totalExpenses,
       total_cash_flows: totalCashFlows,
+      which_is_higher_allocation: whichIsHigherAllocation,
+      difference_allocation: differenceAllocation,  
     };
   
     try {
@@ -174,6 +195,8 @@ const Planners = ({ isSidebarOpen }) => {
           difference: '',
           total_expenses: '',
           total_cash_flows: '',
+          which_is_higher_allocation: '',
+          difference_allocation: '',
           expenses: [],
           cash_flows: []
         });
@@ -236,7 +259,7 @@ const Planners = ({ isSidebarOpen }) => {
 
             <FormRow>
               <label htmlFor="planner_name">Planner Name*</label>
-              <input
+              <InputField
                 id="planner_name"
                 name="planner_name"
                 value={formData.planner_name || ''}
@@ -250,20 +273,26 @@ const Planners = ({ isSidebarOpen }) => {
                     <tr>
                     <th>Total Expenses</th>
                     <th>Total Cash Flows</th>
+                    <th>Total Allocation</th>
                     <th>Which is Higher?</th>
                     <th>Difference</th>
+                    <th style={{color: 'green'}}>Which is Higher?(Allocation)</th>
+                    <th>Difference(Allocation)</th>
                     </tr>
                   </thead>
                   <tbody>
                       <tr>
                         <td>{ totalExpenses }</td>
                         <td>{ totalCashFlows }</td>
+                        <td>{ totalAllocation }</td>
                         <td>
                           <strong>
                             { whichIsHigher }
                           </strong>
                         </td>
                         <td>{ difference }</td>
+                        <td style={{color: 'green'}}><strong>{ whichIsHigherAllocation }</strong></td>
+                        <td>{ differenceAllocation }</td>
                       </tr>
                   </tbody>
                 </table>
@@ -286,7 +315,7 @@ const Planners = ({ isSidebarOpen }) => {
                     // {expenses.map((expense, index) => (
                       <tr key={index}>
                         <td>
-                          <input
+                          <CheckBox
                             type="checkbox"
                             checked={selectedExpenses.some((item) => item._id === expense._id)}
                             onChange={() => handleSelectExpense(expense)}
@@ -314,7 +343,7 @@ const Planners = ({ isSidebarOpen }) => {
                     // {cashFlows.map((cashFlow, index) => (
                       <tr key={index}>
                         <td>
-                          <input
+                          <CheckBox
                             type="checkbox"
                             checked={selectedCashFlows.some((item) => item._id === cashFlow._id)}
                             onChange={() => handleSelectCashFlow(cashFlow)}
@@ -336,6 +365,7 @@ const Planners = ({ isSidebarOpen }) => {
                     <tr>
                       <th>Description</th>
                       <th>Amount</th>
+                      <th>Allocation</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -343,12 +373,20 @@ const Planners = ({ isSidebarOpen }) => {
                       <tr key={expense._id}>
                         <td>{expense.expense_label}</td>
                         <td>{expense.amount}</td>
+                        <td>
+                          <AllocationInput
+                          type='number'
+                          value={expense.allocation}
+                          onChange={(e) => handleAllocationChange(expense._id, e.target.value)}
+                          />
+                        </td>
                       </tr>
                     ))}
                     <tr>
                       <td><strong>Total Expenses</strong></td>
                       <td><strong>{totalExpenses}</strong></td>
-                    </tr>
+                      <td><strong>{ totalAllocation }</strong></td>
+                      </tr>
                   </tbody>
                 </table>
 

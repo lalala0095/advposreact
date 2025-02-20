@@ -129,6 +129,20 @@ export const InputField = styled.input`
   }
 `;
 
+export const CheckBox = styled.input`
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+`;
+
+export const AllocationInput = styled.input`
+  padding: 0.5vh;
+  max-width: 8vh;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+`;
+
 export const DateInputField = styled.input.attrs({ type: 'date' })`
   width: 100%;
   padding: 10px;
